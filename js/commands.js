@@ -76,7 +76,7 @@ ayuda = [
 ];
 
 inicio = [
-  '<span class="index">Espacio personal de Hermes Rodríguez Mohedano. Derechos reservados de </span>' + '<a href="' + github + '" target="_blank">Forrest Knight' + ".</a>",
+  '<span class="index">Espacio personal de Hermes Rodríguez Mohedano. Derechos reservados de </span>' + '<a href="https://github.com/forrestknight/" target="_blank">Forrest Knight' + ".</a>",
   '<br>',
   '<br>',
     "██╗  ██╗███████╗██████╗ ███╗   ███╗███████╗███████╗    ██████╗ ███╗   ███╗",
