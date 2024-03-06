@@ -1,3 +1,7 @@
+.container {
+  width: 80%; /* Esto ocupará el 80% del ancho del contenedor padre */
+  font-size: 1.2em; /* Tamaño de fuente relativo */
+}
 body {
     margin: 0;
     padding: 15px 20px;
