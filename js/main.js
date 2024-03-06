@@ -16,6 +16,7 @@ setTimeout(function() {
 
 window.addEventListener("keyup", enterKey);
 
+console.log("Web basada en un desarrollo de https://github.com/forrestknight/.")
 console.log(
   "%c¡Has hackeado my contraseña!😠",
   "color: #04ff00; font-weight: bold; font-size: 24px;"
