@@ -1,6 +1,13 @@
 .container {
-  width: 80%; /* Esto ocupará el 80% del ancho del contenedor padre */
-  font-size: 1.2em; /* Tamaño de fuente relativo */
+  width: 80%;
+  font-size: 1.2em;
+}
+/* Media query para dispositivos con un ancho máximo de 600px (generalmente dispositivos móviles) */
+@media only screen and (max-width: 600px) {
+  .container {
+    width: 100%; /* Cambia el ancho a 100% para ocupar todo el ancho de la pantalla */
+    font-size: 1em; /* Ajusta el tamaño de la fuente según sea necesario */
+  }
 }
 body {
     margin: 0;
