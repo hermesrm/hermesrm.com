@@ -130,3 +130,7 @@ body {
   a:focus {
     outline: 0;
   }
+  .emoticon {
+    display: inline-block;
+    transform: rotate(90deg); /* Girar el emoticón 45 grados */
+  }
