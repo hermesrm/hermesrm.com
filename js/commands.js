@@ -30,7 +30,25 @@ acerca = [
 
 experiencia = [
   "<br>",
-  "En construcción...",
+  "<strong>AUXILIAR DE ESTIMACIONES</strong>",
+  "Construcciones Bañuelos, S.A. de C.V. | Mérida, Yucatán, México | Junio 2023 - Noviembre 2023",
+  "<blockquote>• Seguimiento de los avances de obra civil y/o eléctrica del proyecto.<br>• Redacción y diseño de documentación (cálculos, planos y evidencia).<br>• Integración de expedientes para su envío al departamento de cobranza.</blockquote>",
+  "<br>",
+  "<strong>CONSULTOR TECNICO DE SOFTWARE</strong>",
+  "Plexus One | Mérida, Yucatán, México | Mayo 2022 - Mayo 2023",
+  "<blockquote>• Trato directo con el cliente para la obtención de requerimientos del proyecto.<br>• Análisis de las necesidades tecnológicas previamente expuestas por el cliente.<br>• Redacción de documentación referente a la requisición de software.<br>• Seguimiento en el avance de los objetivos del proyecto.</blockquote>",
+  "<br>",
+  "<strong>TECNICO AUXILIAR DE LOGISTICA</strong>",
+  "Transportes Panete Zarza, S.L. | Plasencia, Cáceres, España | Agosto 2021 - Abril 2022",
+  "<blockquote>• Transporte especializado de muestras clínicas a hospital general.<br>• Gestión y organización de ruta, destinatarios y tiempo de reparto.<br>• Atención al cliente y gestión de incidencias.</blockquote>",
+  "<br>",
+  "<strong>DIRECTOR DE FONDOS Y SUBSIDIOS</strong>",
+  "H. Ayuntamiento | José María Morelos, Quintana Roo, México | Febrero 2018 - Junio 2021",
+  "<blockquote>• Análisis y elaboración del organigrama general de la administración 2018-2021.<br>• Cooperación en el análisis de soluciones para las diferentes áreas del Ayto.<br>• Seguimiento en el control y gestión de recursos estatales y federales.</blockquote>",
+  "<br>",
+  "<strong>ADMINISTRATIVO</strong>",
+  "Pretensados Morelos, SA. de CV. (COCOPESA) | José María Morelos, México | Mayo 2016 - Febrero 2018",
+  "<blockquote>• Venta de materiales de construcción, manejo de efectivo y atención al cliente.<br>• Control de inventario y gestión de logística, en entrega de pedidos a clientes..<br>• Elaboración y pago de nóminas semanales al personal de plantilla.</blockquote>",
   "<br>"
 ];
 
