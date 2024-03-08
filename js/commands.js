@@ -42,8 +42,8 @@ formacion = [
 
 social = [
   "<br>",
-  'linkedin       <a href="' + linkedin + '" target="_blank">linkedin/hermesrm' + "</a>",
-  'github         <a href="' + github + '" target="_blank">github/hermesrm' + "</a>",
+  '<span class="command">linkedin</span>       <a href="' + linkedin + '" target="_blank">linkedin/hermesrm' + "</a>",
+  '<span class="command">github</span>         <a href="' + github + '" target="_blank">github/hermesrm' + "</a>",
   "<br>"
 ];
 
