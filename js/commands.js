@@ -72,7 +72,7 @@ formacion = [
   "<strong>Certificado Profesional diseñado por Google (180 horas) | Enero 2023 - Presente</strong>",
   "🔹Habilidades: Seguridad de la red, seguridad de la información, resolución de problemas, pensamiento crítico, análisis de amenazas y evaluación de vulnerabilidades, entre otras.",
   "🔹Herramientas: Bash, Chronicle, Linux, Python, Splunk, Suricata, SQL, tcpdump, VirusTotal y WireShark, entre otras.",
-  "<br>"
+  "<br>",
   '<span class="index"><strong>BACHILLERATO GENERAL</strong>',
   "<strong>Centro de Estudios Educare A.C. (CEEAC) | Mérida, Yucatán, México | 2007 - 2010</strong>",
   "🔹Homologado en España",
