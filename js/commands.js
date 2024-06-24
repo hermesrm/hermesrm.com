@@ -8,12 +8,7 @@ acerca = [
   "¡Hola, soy Hermes!✌️",
   "<br>",
   "Me apasiona la tecnología y la informática.",
-  "Soy consultor administrativo y me estoy formando en el ramo de la Seguridad Informática, actualmente curso:",
-  "<br>",  
-  "🐉 <strong>Certificado de Profesionalidad Nivel 3 en Seguridad Informática - IFCT0109.</strong>",
-  "🐍 <strong>Certificado Profesional en Ciberseguridad de Google.</strong>",
-  "<br>",
-  "Estoy decidido a encontrar mi lugar en este sector, por ello:",
+  "Soy consultor administrativo y estoy en formación en el ramo de la seguridad informática, así cómo en otras tecnologías.",
   "<br>",
   '<span class="emoticon">🌲</span> Soy <strong>proactivo.</strong>',
   '<span class="emoticon">🌲</span> Tengo <strong>disponibilidad inmediata.</strong>',
@@ -22,13 +17,21 @@ acerca = [
   '<span class="emoticon">🌲</span> Capacidad de <strong>análisis y trabajo en equipo.</strong>',
   '<span class="emoticon">🌲</span> <strong>Experiencia</strong> en diferentes sectores profesionales.',
   "<br>",
-  "Estoy deseando colaborar contigo y aprender lo necesario para que alcancemos el éxito.",
+  "Estoy deseando colaborar en un proyecto tecnológico y aprender lo necesario para alcanzar el éxito.⁣",
   "<br>",
-  "Saludos cordiales.",
-  "<br>"
 ];
 
 experiencia = [
+  "<br>",
+  '<span class="index"><strong>CERTIFICADO DE PROFESIONALIDAD EN SEGURIDAD INFORMATICA</strong>',
+  "<strong>Aula Cinco Centro de Estudios, S.L. | El Tiemblo, Ávila, España | Diciembre 2023 - Mayo 2024</strong>",
+  "🔹MF0486_3: Seguridad en equipos informáticos. (90 horas)",
+  "🔹MF0487_3: Auditoria de seguridad informática. (90 horas)",
+  "🔹MF0488_3: Gestión de incidentes de seguridad informática. (90 horas)",
+  "🔹MF0489_3: Sistemas seguros de acceso y transmisión de datos. (60 horas)",
+  "🔹MF0490_3: Gestión de servicios en el sistema informático. (90 horas)",
+  "🔹<strong>MP0175: Prácticas en Wallbyte Sistems, S.L. | Ávila, Ávila, ES (80 horas)</strong>",
+  "<br>",
   "<br>",
   '<span class="index"><strong>AUXILIAR DE ESTIMACIONES</strong>',
   "<strong>Construcciones Bañuelos, S.A. de C.V. | Mérida, Yucatán, México | Junio 2023 - Noviembre 2023</strong>",
@@ -65,7 +68,14 @@ experiencia = [
 
 formacion = [
   "<br>",
-  "En construcción...",
+  '<span class="index"><strong>CERTIFICADO PROFESIONAL DE CIBERSEGURIDAD BY GOOGLE</strong>',
+  "<strong>Certificado Profesional diseñado por Google (180 horas) | Enero 2023 - Presente</strong>",
+  "🔹Habilidades: Seguridad de la red, seguridad de la información, resolución de problemas, pensamiento crítico, análisis de amenazas y evaluación de vulnerabilidades, entre otras.",
+  "🔹Herramientas: Bash, Chronicle, Linux, Python, Splunk, Suricata, SQL, tcpdump, VirusTotal y WireShark, entre otras.",
+  "<br>"
+  '<span class="index"><strong>BACHILLERATO GENERAL</strong>',
+  "<strong>Centro de Estudios Educare A.C. (CEEAC) | Mérida, Yucatán, México | 2007 - 2010</strong>",
+  "🔹Homologado en España",
   "<br>"
 ];
 
