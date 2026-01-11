@@ -1,0 +1,96 @@
+/* =============================
+   Terminal CSS — hermesrm.com
+   ============================= */
+
+/* Reset mínimo */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden; /* scroll controlado por el contenedor */
+}
+
+/* Base visual */
+body {
+  background-color: #0d1117; /* negro técnico */
+  color: #c9d1d9;
+  font-family: "Cascadia Code", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: clamp(14px, 2.5vw, 16px);
+  line-height: 1.45;
+}
+
+/* Contenedor principal de la terminal */
+#terminal {
+  height: 100%;
+  padding: 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  /* Safe areas (iOS / móviles modernos) */
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+}
+
+/* Salida de la terminal */
+#output {
+  white-space: pre-wrap;      /* mantiene saltos de línea */
+  word-break: break-word;    /* rompe palabras largas */
+  overflow-wrap: anywhere;   /* última defensa contra overflow */
+}
+
+/* Línea de input */
+.input-line {
+  display: flex;
+  flex-wrap: wrap;           /* permite adaptación en móviles */
+  align-items: center;
+}
+
+/* Prompt */
+.prompt {
+  color: #03C04A;            /* verde vibrante */
+  margin-right: 6px;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Input de comandos */
+#command {
+  flex: 1;
+  min-width: 0;              /* evita overflow en pantallas pequeñas */
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  font: inherit;
+
+  /* Caret estilo terminal */
+  caret-color: #03C04A;
+  caret-shape: block; /* navegadores que lo soporten */
+}
+
+/* Refuerzo visual del caret (fallback seguro) */
+#command:focus {
+  text-shadow: 0 0 0 #03C04A;
+}
+
+/* Comentarios tipo shell (ej. tips) */
+.comment {
+  color: #8b949e;
+}
+
+/* Errores */
+.error {
+  color: #f85149;
+}
+
+/* Selección de texto */
+::selection {
+  background: #005f87;
+}
