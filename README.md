@@ -99,10 +99,3 @@
 ### Recommendations
 - Keep translations synchronized between both languages.
 - To improve path autocompletion or add fuzzy search, modify `getPathCompletions` and `getCompletions` in `main.js`.
-
----
-
-If you want, I can also:
-- Add a short examples section with common command sequences.
-- Generate a minimal `CONTRIBUTING.md` or `DEVELOPMENT.md` with local setup steps.
-- Add inline JSDoc comments to main functions for code documentation.
