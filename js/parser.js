@@ -9,9 +9,9 @@ import { aliasRegistry } from "./aliases.js";
   Resuelve alias simples antes de procesar el comando.
   Solo se aplica si el input completo coincide con un alias.
 */
-function resolveAlias(input) {
+function resolveAlias(input, lang = "es") {
   const trimmed = input.trim();
-  return aliasRegistry[trimmed] || trimmed;
+  return (aliasRegistry[lang] && aliasRegistry[lang][trimmed]) || trimmed;
 }
 
 /*
@@ -34,7 +34,7 @@ function tokenize(input) {
 function executeInput(rawInput, context, commandRegistry) {
   if (!rawInput.trim()) return "";
 
-  const resolvedInput = resolveAlias(rawInput);
+  const resolvedInput = resolveAlias(rawInput, context.lang);
   const { command, args } = tokenize(resolvedInput);
 
   const cmd = commandRegistry.find(c =>
@@ -48,7 +48,14 @@ function executeInput(rawInput, context, commandRegistry) {
     }[context.lang];
   }
 
-  return cmd.execute(context, args, commandRegistry) || "";
+  try {
+    return cmd.execute(context, args, commandRegistry) || "";
+  } catch (error) {
+    return {
+      es: `Error ejecutando comando: ${error.message}`,
+      en: `Error executing command: ${error.message}`
+    }[context.lang];
+  }
 }
 
 export {

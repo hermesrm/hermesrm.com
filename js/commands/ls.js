@@ -16,7 +16,7 @@ const lsCommand = {
     en: "List directory contents"
   },
 
-  execute(context) {
+  execute(context, args) {
     const node = resolveCwd(context);
 
     if (!node || node.type !== "dir") {
@@ -26,7 +26,22 @@ const lsCommand = {
       }[context.lang];
     }
 
-    return Object.keys(node.children).join("  ");
+    const hasLongFlag = args && args.includes("-l");
+    const items = Object.entries(node.children);
+
+    if (!hasLongFlag) {
+      // Formato simple
+      return items.map(([name]) => name).join("  ");
+    }
+
+    // Formato largo (-l)
+    const lines = items.map(([name, child]) => {
+      const type = child.type === "dir" ? "d" : "-";
+      const typeStr = child.type === "dir" ? "/" : "";
+      return `${type}  ${name}${typeStr}`;
+    });
+
+    return lines.join("\n");
   }
 };
 

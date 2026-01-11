@@ -17,15 +17,18 @@
     <div id="output"></div>
 
     <div class="input-line">
-      <span class="prompt"></span>
-      <input
-        id="command"
-        type="text"
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="none"
-        spellcheck="false"
-      />
+      <div class="prompt" id="prompt-text"></div>
+      <div class="prompt-line">
+        <span class="prompt-symbol" id="prompt-symbol">$</span>
+        <input
+          id="command"
+          type="text"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="none"
+          spellcheck="false"
+        />
+      </div>
     </div>
   </div>
 

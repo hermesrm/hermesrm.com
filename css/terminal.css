@@ -27,14 +27,16 @@ body {
 #terminal {
   height: 100%;
   padding: 16px;
+  padding-left: 10px;
   overflow-y: auto;
   overflow-x: hidden;
+  scroll-behavior: smooth;
 
   /* Safe areas (iOS / móviles modernos) */
   padding-top: env(safe-area-inset-top);
   padding-right: env(safe-area-inset-right);
   padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
+  padding-left: max(10px, env(safe-area-inset-left));
 }
 
 /* Salida de la terminal */
@@ -47,20 +49,42 @@ body {
 /* Línea de input */
 .input-line {
   display: flex;
-  flex-wrap: wrap;           /* permite adaptación en móviles */
-  align-items: center;
+  flex-direction: column;
+  margin-top: 0;
 }
 
-/* Prompt */
+/* Prompt - ahora puede ser multilínea */
 .prompt {
   color: #03C04A;            /* verde vibrante */
-  margin-right: 6px;
-  white-space: nowrap;
+  margin-bottom: 0;
+  white-space: pre-wrap;     /* preserva saltos de línea */
+  word-break: break-word;
   user-select: none;
   pointer-events: none;
+  font-weight: normal;
 }
 
-/* Input de comandos */
+/* Parte oro del prompt (ruta y símbolo) */
+.prompt-path {
+  color: #FFD700;            /* color oro/amarillo gitbash */
+}
+
+/* Contenedor del símbolo del prompt y input */
+.prompt-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+/* Símbolo $ */
+.prompt-symbol {
+  color: #ffffff;            /* blanco */
+  user-select: none;
+  pointer-events: none;
+  flex-shrink: 0;
+}
 #command {
   flex: 1;
   min-width: 0;              /* evita overflow en pantallas pequeñas */
@@ -71,13 +95,13 @@ body {
   font: inherit;
 
   /* Caret estilo terminal */
-  caret-color: #03C04A;
+  caret-color: #ffffff;      /* blanco */
   caret-shape: block; /* navegadores que lo soporten */
 }
 
 /* Refuerzo visual del caret (fallback seguro) */
 #command:focus {
-  text-shadow: 0 0 0 #03C04A;
+  text-shadow: 0 0 0 #ffffff;
 }
 
 /* Comentarios tipo shell (ej. tips) */

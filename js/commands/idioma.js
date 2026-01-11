@@ -17,28 +17,45 @@ const languageCommand = {
   },
 
   execute(context, args) {
-    // Mostrar idioma actual
+    // Mostrar idioma actual e instrucciones
     if (!args || !args.length) {
-      return {
-        es: `Idioma actual: ${context.lang}`,
-        en: `Current language: ${context.lang}`
-      }[context.lang];
+      const currentLang = context.lang === "es" ? "Español (es)" : "English (en)";
+      
+      if (context.lang === "es") {
+        return [
+          `Idioma actual: ${currentLang}`,
+          "",
+          "Para cambiar el idioma, usa:",
+          "  idioma en    → Cambiar a inglés",
+          "  idioma es    → Cambiar a español"
+        ].join("\n");
+      } else {
+        return [
+          `Current language: ${currentLang}`,
+          "",
+          "To change the language, use:",
+          "  language es  → Change to Spanish",
+          "  language en  → Change to English"
+        ].join("\n");
+      }
     }
 
     const requested = args[0].toLowerCase();
 
     if (!SUPPORTED_LANGS.includes(requested)) {
       return {
-        es: `Idioma no soportado: ${requested}`,
-        en: `Unsupported language: ${requested}`
+        es: `Idioma no soportado: ${requested}. Usa 'idioma es' o 'idioma en'`,
+        en: `Unsupported language: ${requested}. Use 'language es' or 'language en'`
       }[context.lang];
     }
 
     context.lang = requested;
 
+    const newLang = requested === "es" ? "Español (es)" : "English (en)";
+    
     return {
-      es: `Idioma cambiado a: ${requested}`,
-      en: `Language changed to: ${requested}`
+      es: `✓ Idioma cambiado a: ${newLang}`,
+      en: `✓ Language changed to: ${newLang}`
     }[context.lang];
   }
 };

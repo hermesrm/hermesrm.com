@@ -22,8 +22,15 @@ const cdCommand = {
 
     if (!result) {
       return {
-        es: "Directorio no encontrado",
-        en: "Directory not found"
+        es: `cd: directorio no encontrado: ${target}`,
+        en: `cd: no such file or directory: ${target}`
+      }[context.lang];
+    }
+
+    if (result.node.type !== "dir") {
+      return {
+        es: `cd: no es un directorio: ${target}`,
+        en: `cd: not a directory: ${target}`
       }[context.lang];
     }
 
