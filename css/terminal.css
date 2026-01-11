@@ -59,8 +59,6 @@ body {
   margin-bottom: 0;
   white-space: pre-wrap;     /* preserva saltos de línea */
   word-break: break-word;
-  user-select: none;
-  pointer-events: none;
   font-weight: normal;
 }
 
@@ -81,8 +79,6 @@ body {
 /* Símbolo $ */
 .prompt-symbol {
   color: #ffffff;            /* blanco */
-  user-select: none;
-  pointer-events: none;
   flex-shrink: 0;
 }
 #command {

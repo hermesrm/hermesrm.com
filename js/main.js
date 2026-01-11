@@ -363,7 +363,18 @@ inputEl.addEventListener("keydown", (e) => {
    Focus & init
    ============================= */
 
-document.addEventListener("click", () => inputEl.focus());
+document.addEventListener("click", (e) => {
+  // Si hay texto seleccionado, no interferar
+  const selection = window.getSelection();
+  if (selection.toString().length > 0) {
+    return;
+  }
+  
+  // Solo enfocar el input si el click NO fue en el output (para permitir seleccionar)
+  if (!output.contains(e.target)) {
+    inputEl.focus();
+  }
+});
 
 showWelcome();
 inputEl.focus();
