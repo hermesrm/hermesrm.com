@@ -76,6 +76,10 @@ body {
   width: 100%;
 }
 
+.prompt-line.input-mode #command {
+  margin-left: -6px;
+}
+
 /* Símbolo $ */
 .prompt-symbol {
   color: #ffffff;            /* blanco */

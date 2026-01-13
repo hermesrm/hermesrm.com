@@ -30,6 +30,7 @@ const promptTextEl = document.getElementById("prompt-text");
 const promptSymbolEl = document.getElementById("prompt-symbol");
 const inputEl = document.getElementById("command");
 const suggestionsEl = document.getElementById("suggestions");
+const promptLineEl = document.querySelector(".prompt-line");
 
 /* =============================
    Command registry
@@ -55,6 +56,23 @@ const commandRegistry = [
 
 const USERNAME_MAX_LENGTH = 16;
 const USERNAME_REGEX = /^[a-z0-9]+$/;
+const STORAGE_KEY = "hermesrm_username";
+
+/* =============================
+   localStorage helpers
+   ============================= */
+
+function saveUsername(name) {
+  localStorage.setItem(STORAGE_KEY, name);
+}
+
+function getSavedUsername() {
+  return localStorage.getItem(STORAGE_KEY) || null;
+}
+
+function clearSavedUsername() {
+  localStorage.removeItem(STORAGE_KEY);
+}
 
 /* =============================
    Autocompletion helpers
@@ -165,6 +183,9 @@ function showSuggestions(completions) {
   const label = SessionContext.lang === "es" ? "# Sugerencias: " : "# Suggestions: ";
   suggestionsEl.textContent = label + completions.join(", ");
   suggestionsEl.style.display = "block";
+  
+  // Hacer scroll para que las sugerencias sean visibles
+  suggestionsEl.scrollIntoView({ behavior: "smooth", block: "end" });
 }
 
 function clearSuggestions() {
@@ -217,6 +238,7 @@ function renderPrompt() {
   const prompt = buildPrompt();
   promptTextEl.innerHTML = `${prompt.userHost} <span class="prompt-path">${prompt.path}</span>`;
   promptSymbolEl.className = "prompt-symbol prompt-path";
+  promptSymbolEl.textContent = "$";
 }
 
 /* =============================
@@ -235,22 +257,53 @@ SessionContext.lang = detectBrowserLang();
    ============================= */
 
 function showWelcome() {
-  if (SessionContext.lang === "es") {
-    printLine("Bienvenido a hermesrm.com");
-    printLine("\n");
-    printLine("Currículum interactivo en modo consola.\n");
-    printLine("Puede explorar el perfil usando comandos.");
-    printLine("\n");
-    printLine("Escriba 'help' para ver las opciones disponibles.\n");
-    promptTextEl.innerHTML = "Nombre (opcional): <span class=\"prompt-path\">";
+  const savedName = getSavedUsername();
+  
+  if (savedName) {
+    // Hay nombre guardado - preguntar si continuar con él
+    SessionContext.visitor.name = savedName;
+    savedUsernameMode = true;
+    
+    printLine(`Bienvenido de vuelta, ${savedName}!`);
+    printLine("");
+    printLine(SessionContext.lang === "es" ? "¿Deseas continuar con este nombre de usuario? (s/n)" : "Do you want to continue with this username? (y/n)");
+    
+    promptLineEl.classList.add("input-mode");
+    
+    if (SessionContext.lang === "es") {
+      promptTextEl.innerHTML = "";
+      promptSymbolEl.className = "prompt";
+      promptSymbolEl.textContent = "Respuesta: ";
+    } else {
+      promptTextEl.innerHTML = "";
+      promptSymbolEl.className = "prompt";
+      promptSymbolEl.textContent = "Answer: ";
+    }
   } else {
-    printLine("Welcome to hermesrm.com");
-    printLine();
-    printLine("Interactive résumé in console mode.\n");
-    printLine("You can explore the profile using commands.");
-    printLine("\n");
-    printLine("Type 'help' to see available options.\n");
-    promptTextEl.innerHTML = "Nombre (optional): <span class=\"prompt-path\">";
+    // Primer acceso - pedir nombre
+    if (SessionContext.lang === "es") {
+      printLine("Bienvenido a hermesrm.com");
+      printLine("\n");
+      printLine("Currículum interactivo en modo consola.\n");
+      printLine("Puede explorar el perfil usando comandos.");
+      printLine("\n");
+      printLine("Escriba 'help' para ver las opciones disponibles.\n");
+      promptLineEl.classList.add("input-mode");
+      promptTextEl.innerHTML = "";
+      promptSymbolEl.className = "prompt";
+      promptSymbolEl.innerHTML = "Nombre <span style=\"color: #0078D4;\">(opcional)</span>: ";
+    } else {
+      printLine("Welcome to hermesrm.com");
+      printLine();
+      printLine("Interactive résumé in console mode.\n");
+      printLine("You can explore the profile using commands.");
+      printLine("\n");
+      printLine("Type 'help' to see available options.\n");
+      promptLineEl.classList.add("input-mode");
+      promptTextEl.innerHTML = "";
+      promptSymbolEl.className = "prompt";
+      promptSymbolEl.innerHTML = "Name <span style=\"color: #0078D4;\">(optional)</span>: ";
+    }
   }
 }
 
@@ -259,20 +312,72 @@ function showWelcome() {
    ============================= */
 
 let awaitingName = true;
+let savedUsernameMode = false; // Para detectar si estamos en modo "aceptar nombre previo"
 
 function handleEnter() {
   const rawInput = inputEl.value;
   inputEl.value = "";
   clearSuggestions();
 
-  // Capture visitor name (with normalization)
   if (awaitingName) {
-    let name = rawInput.trim().toLowerCase();
+    // Modo: Preguntar si continuar con nombre guardado
+    if (savedUsernameMode) {
+      const response = rawInput.trim().toLowerCase();
+      
+      if (response === "s" || response === "y" || response === "si" || response === "yes") {
+        // Acepta el nombre guardado
+        awaitingName = false;
+        savedUsernameMode = false;
+        
+        if (SessionContext.lang === "es") {
+          printLine("# Consejo: escriba 'acerca', 'experiencia' o 'help' para comenzar", "comment");
+        } else {
+          printLine("# Tip: write 'about', 'experience' or 'help' to begin", "comment");
+        }
+        
+        scrollToBottom();
+        promptLineEl.classList.remove("input-mode");
+        renderPrompt();
+        return;
+      } else if (response === "n" || response === "no") {
+        // Rechaza y pide nuevo nombre
+        savedUsernameMode = false;
+        clearSavedUsername();
+        
+        if (SessionContext.lang === "es") {
+          printLine("Ingrese un nuevo nombre:");
+          promptLineEl.classList.add("input-mode");
+          promptTextEl.innerHTML = "";
+          promptSymbolEl.className = "prompt";
+          promptSymbolEl.innerHTML = "Nombre <span style=\"color: #0078D4;\">(nuevo)</span>: ";
+        } else {
+          printLine("Enter a new name:");
+          promptLineEl.classList.add("input-mode");
+          promptTextEl.innerHTML = "";
+          promptSymbolEl.className = "prompt";
+          promptSymbolEl.innerHTML = "Name <span style=\"color: #0078D4;\">(new)</span>: ";
+        }
+        
 
-    // Remove all spaces
+        scrollToBottom();
+        inputEl.focus();
+        return;
+      } else {
+        // Respuesta inválida
+        if (SessionContext.lang === "es") {
+          printLine("Por favor responde con 's' (sí) o 'n' (no)", "comment");
+        } else {
+          printLine("Please answer with 'y' (yes) or 'n' (no)", "comment");
+        }
+        inputEl.focus();
+        return;
+      }
+    }
+    
+    // Modo: Ingresar nombre por primera vez o nuevo
+    let name = rawInput.trim().toLowerCase();
     name = name.replace(/\s+/g, "");
 
-    // Validate and normalize
     if (!name) {
       name = "guest";
     } else {
@@ -283,18 +388,18 @@ function handleEnter() {
     }
 
     SessionContext.visitor.name = name;
+    saveUsername(name); // Guardar en localStorage
     awaitingName = false;
-    
-    if (SessionContext.lang === "es") {
-      printLine("# Consejo: escriba 'skills', 'experience' o 'help' para comenzar", "comment");
-    } else {
-      printLine("# Tip: write 'skills', 'experience' or 'help' to begin", "comment");
-    }
-    
-    printLine("");
-    scrollToBottom();
-    renderPrompt();
 
+    if (SessionContext.lang === "es") {
+      printLine("# Consejo: escriba 'acerca', 'experiencia' o 'help' para comenzar", "comment");
+    } else {
+      printLine("# Tip: write 'about', 'experience' or 'help' to begin", "comment");
+    }
+
+    scrollToBottom();
+    promptLineEl.classList.remove("input-mode");
+    renderPrompt();
     return;
   }
 
