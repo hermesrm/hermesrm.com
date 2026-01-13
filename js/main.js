@@ -19,6 +19,7 @@ import { pdfCommand } from "./commands/pdf.js";
 import { pwdCommand } from "./commands/pwd.js";
 import { clearCommand } from "./commands/clear.js";
 import { echoCommand } from "./commands/echo.js";
+import { rebootCommand } from "./commands/reboot.js";
 
 /* =============================
    DOM references
@@ -46,7 +47,8 @@ const commandRegistry = [
   pdfCommand,
   pwdCommand,
   clearCommand,
-  echoCommand
+  echoCommand,
+  rebootCommand
 ];
 
 /* =============================
@@ -472,6 +474,29 @@ function handleEnter() {
   printCommandHistory(prompt.userHost, prompt.path, rawInput);
 
   const result = executeInput(rawInput, SessionContext, commandRegistry);
+
+  // Señal de reinicio de consola
+  if (result === "__REBOOT__") {
+    // Reset de estado de sesión (manteniendo idioma y FS)
+    SessionContext.cwd = [];
+    SessionContext.history = [];
+    SessionContext.historyIndex = null;
+    SessionContext.visitor.name = null;
+
+    // Olvidar nombres guardados para simular primera visita
+    clearSavedUsername();
+
+    // Reset de flags locales
+    awaitingName = true;
+    savedUsernameMode = false;
+    changingName = false;
+
+    // Limpiar pantalla y reiniciar flujo
+    output.innerHTML = "";
+    showWelcome();
+    inputEl.focus();
+    return;
+  }
 
   if (result) {
     if (isAliasCommand || isHelpCommand) {

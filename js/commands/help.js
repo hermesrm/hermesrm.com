@@ -75,7 +75,7 @@ const helpCommand = {
     lines.push("");
 
     // 2) Comandos nativos (Linux)
-    const LINUX_IDS = new Set(["LS", "CD", "CAT", "PWD", "CLEAR", "ECHO", "HISTORY", "WHOAMI", "HELP"]);
+    const LINUX_IDS = new Set(["LS", "CD", "CAT", "PWD", "CLEAR", "ECHO", "HISTORY", "WHOAMI", "HELP", "REBOOT"]);
     const native = commandRegistry.filter(c => LINUX_IDS.has(c.id));
 
     lines.push(
