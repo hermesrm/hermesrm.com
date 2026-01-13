@@ -30,7 +30,6 @@ const promptTextEl = document.getElementById("prompt-text");
 const promptSymbolEl = document.getElementById("prompt-symbol");
 const inputEl = document.getElementById("command");
 const suggestionsEl = document.getElementById("suggestions");
-const promptLineEl = document.querySelector(".prompt-line");
 
 /* =============================
    Command registry
@@ -208,6 +207,12 @@ function printLine(text, cssClass = "") {
   output.appendChild(div);
 }
 
+function removeLastLine() {
+  if (output.lastChild) {
+    output.removeChild(output.lastChild);
+  }
+}
+
 function printCommandHistory(userHost, path, command) {
   // Primera línea: prompt con colores
   const promptDiv = document.createElement("div");
@@ -268,8 +273,6 @@ function showWelcome() {
     printLine("");
     printLine(SessionContext.lang === "es" ? "¿Deseas continuar con este nombre de usuario? (s/n)" : "Do you want to continue with this username? (y/n)");
     
-    promptLineEl.classList.add("input-mode");
-    
     if (SessionContext.lang === "es") {
       promptTextEl.innerHTML = "";
       promptSymbolEl.className = "prompt";
@@ -288,7 +291,6 @@ function showWelcome() {
       printLine("Puede explorar el perfil usando comandos.");
       printLine("\n");
       printLine("Escriba 'help' para ver las opciones disponibles.\n");
-      promptLineEl.classList.add("input-mode");
       promptTextEl.innerHTML = "";
       promptSymbolEl.className = "prompt";
       promptSymbolEl.innerHTML = "Nombre <span style=\"color: #0078D4;\">(opcional)</span>: ";
@@ -299,7 +301,6 @@ function showWelcome() {
       printLine("You can explore the profile using commands.");
       printLine("\n");
       printLine("Type 'help' to see available options.\n");
-      promptLineEl.classList.add("input-mode");
       promptTextEl.innerHTML = "";
       promptSymbolEl.className = "prompt";
       promptSymbolEl.innerHTML = "Name <span style=\"color: #0078D4;\">(optional)</span>: ";
@@ -313,6 +314,7 @@ function showWelcome() {
 
 let awaitingName = true;
 let savedUsernameMode = false; // Para detectar si estamos en modo "aceptar nombre previo"
+let changingName = false; // Para detectar si estamos cambiando de un nombre previo
 
 function handleEnter() {
   const rawInput = inputEl.value;
@@ -329,6 +331,9 @@ function handleEnter() {
         awaitingName = false;
         savedUsernameMode = false;
         
+        // Remover la pregunta del usuario
+        removeLastLine();
+        
         if (SessionContext.lang === "es") {
           printLine("# Consejo: escriba 'acerca', 'experiencia' o 'help' para comenzar", "comment");
         } else {
@@ -336,23 +341,21 @@ function handleEnter() {
         }
         
         scrollToBottom();
-        promptLineEl.classList.remove("input-mode");
         renderPrompt();
         return;
       } else if (response === "n" || response === "no") {
         // Rechaza y pide nuevo nombre
         savedUsernameMode = false;
+        changingName = true; // Marcar que estamos cambiando de nombre
         clearSavedUsername();
         
         if (SessionContext.lang === "es") {
           printLine("Ingrese un nuevo nombre:");
-          promptLineEl.classList.add("input-mode");
           promptTextEl.innerHTML = "";
           promptSymbolEl.className = "prompt";
           promptSymbolEl.innerHTML = "Nombre <span style=\"color: #0078D4;\">(nuevo)</span>: ";
         } else {
           printLine("Enter a new name:");
-          promptLineEl.classList.add("input-mode");
           promptTextEl.innerHTML = "";
           promptSymbolEl.className = "prompt";
           promptSymbolEl.innerHTML = "Name <span style=\"color: #0078D4;\">(new)</span>: ";
@@ -391,14 +394,25 @@ function handleEnter() {
     saveUsername(name); // Guardar en localStorage
     awaitingName = false;
 
+    // Si estamos cambiando de un nombre anterior, borrar las líneas previas
+    if (changingName) {
+      removeLastLine(); // Remove: "Ingrese un nuevo nombre:" / "Enter a new name:"
+      removeLastLine(); // Remove: "¿Deseas continuar..." / "Do you want to continue..."
+      removeLastLine(); // Remove: línea vacía
+      removeLastLine(); // Remove: "Bienvenido de vuelta, nombre!" / "Welcome back, name!"
+      changingName = false;
+    }
+
+    // Mostrar mensaje de bienvenida con el nombre
     if (SessionContext.lang === "es") {
+      printLine(`Bienvenido, ${name}!`);
       printLine("# Consejo: escriba 'acerca', 'experiencia' o 'help' para comenzar", "comment");
     } else {
+      printLine(`Welcome, ${name}!`);
       printLine("# Tip: write 'about', 'experience' or 'help' to begin", "comment");
     }
 
     scrollToBottom();
-    promptLineEl.classList.remove("input-mode");
     renderPrompt();
     return;
   }
