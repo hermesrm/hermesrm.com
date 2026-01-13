@@ -4,7 +4,7 @@
    ============================= */
 
 import { SessionContext, getCwdPath, resolvePath, resolveCwd } from "./context.js";
-import { executeInput } from "./parser.js";
+import { executeInput, resolveAlias, tokenize } from "./parser.js";
 import { aliasRegistry } from "./aliases.js";
 
 // Commands
@@ -202,7 +202,8 @@ function scrollToBottom() {
 
 function printLine(text, cssClass = "") {
   const div = document.createElement("div");
-  div.textContent = text;
+  // Asegurar que las líneas en blanco se rendericen visualmente
+  div.textContent = (text === "" ? "\u00A0" : text);
   if (cssClass) div.classList.add(cssClass);
   output.appendChild(div);
 }
@@ -423,17 +424,27 @@ function handleEnter() {
   }
   SessionContext.historyIndex = null;
 
+  const resolvedInput = resolveAlias(rawInput, SessionContext.lang);
+  const { command } = tokenize(resolvedInput);
+  const isHelpCommand = command === "help";
+  const isAliasCommand = Boolean(aliasRegistry[SessionContext.lang]?.[rawInput.trim()]);
+
   const prompt = buildPrompt();
   printCommandHistory(prompt.userHost, prompt.path, rawInput);
 
   const result = executeInput(rawInput, SessionContext, commandRegistry);
 
   if (result) {
-    printLine(result);
+    if (isAliasCommand || isHelpCommand) {
+      // Espacios para comandos alias o help
+      printLine("");
+      printLine(result);
+      printLine("");
+    } else {
+      // Sin espacios extra para comandos nativos
+      printLine(result);
+    }
   }
-
-  // Agregar línea en blanco para separación
-  printLine("");
   
   scrollToBottom();
   renderPrompt();
