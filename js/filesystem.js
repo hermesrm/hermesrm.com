@@ -161,6 +161,21 @@ SECURITY AND BEST PRACTICES
               }
             }
           }
+        },
+
+        pdf: {
+          type: "dir",
+          name: "pdf",
+          children: {
+            content: {
+              type: "file",
+              name: "content",
+              content: {
+                es: `Currículum en PDF disponible en: /assets/HermesRM_CV.pdf`,
+                en: `PDF résumé available at: /assets/HermesRM_CV.pdf`
+              }
+            }
+          }
         }
       }
     }

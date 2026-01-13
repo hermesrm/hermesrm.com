@@ -114,3 +114,10 @@ body {
 ::selection {
   background: #005f87;
 }
+
+/* Sugerencias bajo la línea de entrada */
+.suggestions {
+  margin-top: 4px;
+  color: #8b949e;
+  display: none;
+}

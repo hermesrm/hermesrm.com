@@ -6,7 +6,7 @@
 const clearCommand = {
   id: "CLEAR",
   aliases: {
-    es: ["clear", "limpiar"],
+    es: ["clear"],
     en: ["clear"]
   },
   description: {

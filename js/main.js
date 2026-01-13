@@ -29,6 +29,7 @@ const output = document.getElementById("output");
 const promptTextEl = document.getElementById("prompt-text");
 const promptSymbolEl = document.getElementById("prompt-symbol");
 const inputEl = document.getElementById("command");
+const suggestionsEl = document.getElementById("suggestions");
 
 /* =============================
    Command registry
@@ -59,6 +60,16 @@ const USERNAME_REGEX = /^[a-z0-9]+$/;
    Autocompletion helpers
    ============================= */
 
+function filterAliasesByLanguage(word, lang) {
+  const current = aliasRegistry[lang] || {};
+  const other = aliasRegistry[lang === "es" ? "en" : "es"] || {};
+
+  // Solo sugerir alias propios del idioma actual (evita los que existen en ambos)
+  return Object.keys(current)
+    .filter(alias => alias.startsWith(word))
+    .filter(alias => !(alias in other));
+}
+
 function getCompletions(input, context, commandRegistry) {
   const trimmed = input.trim();
   const parts = trimmed.split(/\s+/);
@@ -74,9 +85,8 @@ function getCompletions(input, context, commandRegistry) {
       .flatMap(cmd => cmd.aliases[context.lang] || [])
       .filter(alias => alias.startsWith(word));
     
-    // Buscar alias que coincidan solo en el idioma actual
-    const aliasMatches = Object.keys(aliasRegistry[context.lang] || {})
-      .filter(alias => alias.startsWith(word));
+    // Alias solo del idioma activo (excluye los que también existen en el otro idioma)
+    const aliasMatches = filterAliasesByLanguage(word, context.lang);
     
     return [...commandMatches, ...aliasMatches];
   }
@@ -143,6 +153,23 @@ function applyCompletion(input, completion) {
   }
   parts[parts.length - 1] = completion;
   return parts.join(" ");
+}
+
+function showSuggestions(completions) {
+  if (!completions.length) {
+    suggestionsEl.style.display = "none";
+    suggestionsEl.textContent = "";
+    return;
+  }
+
+  const label = SessionContext.lang === "es" ? "# Sugerencias: " : "# Suggestions: ";
+  suggestionsEl.textContent = label + completions.join(", ");
+  suggestionsEl.style.display = "block";
+}
+
+function clearSuggestions() {
+  suggestionsEl.style.display = "none";
+  suggestionsEl.textContent = "";
 }
 
 /* =============================
@@ -236,6 +263,7 @@ let awaitingName = true;
 function handleEnter() {
   const rawInput = inputEl.value;
   inputEl.value = "";
+  clearSuggestions();
 
   // Capture visitor name (with normalization)
   if (awaitingName) {
@@ -311,9 +339,12 @@ inputEl.addEventListener("keydown", (e) => {
         if (completions.length === 1) {
           // Si hay una única opción, aplicar
           inputEl.value = applyCompletion(input, completions[0]);
+          clearSuggestions();
         } else if (completions.length > 1) {
-          // Si hay múltiples, mostrar sugerencias
-          printLine("# Sugerencias: " + completions.join(", "), "comment");
+          // Si hay múltiples, mostrar sugerencias bajo el prompt
+          showSuggestions(completions);
+        } else {
+          clearSuggestions();
         }
       } catch (err) {
         console.error("Error en autocompletación:", err);
@@ -324,6 +355,7 @@ inputEl.addEventListener("keydown", (e) => {
 
   if (e.key === "Enter") {
     e.preventDefault();
+    clearSuggestions();
     handleEnter();
     return;
   }
@@ -341,6 +373,7 @@ inputEl.addEventListener("keydown", (e) => {
     }
 
     inputEl.value = history[SessionContext.historyIndex];
+    clearSuggestions();
   }
 
   if (e.key === "ArrowDown") {
@@ -356,6 +389,12 @@ inputEl.addEventListener("keydown", (e) => {
       SessionContext.historyIndex = null;
       inputEl.value = "";
     }
+    clearSuggestions();
+  }
+
+  // En cualquier otra tecla, ocultar sugerencias para no dejar basura visual
+  if (e.key !== "Tab") {
+    clearSuggestions();
   }
 });
 

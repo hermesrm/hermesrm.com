@@ -6,7 +6,7 @@
 const helpCommand = {
   id: "HELP",
   aliases: {
-    es: ["help", "ayuda"],
+    es: ["help"],
     en: ["help"]
   },
   description: {

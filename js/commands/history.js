@@ -6,7 +6,7 @@
 const historyCommand = {
   id: "HISTORY",
   aliases: {
-    es: ["history", "historial"],
+    es: ["history"],
     en: ["history"]
   },
   description: {
