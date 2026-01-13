@@ -269,7 +269,7 @@ function showWelcome() {
     SessionContext.visitor.name = savedName;
     savedUsernameMode = true;
     
-    printLine(`Bienvenido de vuelta, ${savedName}!`);
+    printLine(`¡Bienvenido/a de vuelta, ${savedName}!`);
     printLine("");
     printLine(SessionContext.lang === "es" ? "¿Deseas continuar con este nombre de usuario? (s/n)" : "Do you want to continue with this username? (y/n)");
     
@@ -285,22 +285,22 @@ function showWelcome() {
   } else {
     // Primer acceso - pedir nombre
     if (SessionContext.lang === "es") {
-      printLine("Bienvenido a hermesrm.com");
-      printLine("\n");
-      printLine("Currículum interactivo en modo consola.\n");
+      printLine("¡Bienvenido/a a hermesrm.com!");
+      printLine("");
+      printLine("Currículum interactivo en modo consola.");
       printLine("Puede explorar el perfil usando comandos.");
-      printLine("\n");
-      printLine("Escriba 'help' para ver las opciones disponibles.\n");
+      printLine("");
+      printLine("Escriba 'help' para ver las opciones disponibles.");
       promptTextEl.innerHTML = "";
       promptSymbolEl.className = "prompt";
       promptSymbolEl.innerHTML = "Nombre <span style=\"color: #0078D4;\">(opcional)</span>: ";
     } else {
-      printLine("Welcome to hermesrm.com");
-      printLine();
-      printLine("Interactive résumé in console mode.\n");
+      printLine("Welcome to hermesrm.com!");
+      printLine("");
+      printLine("Interactive résumé in console mode.");
       printLine("You can explore the profile using commands.");
-      printLine("\n");
-      printLine("Type 'help' to see available options.\n");
+      printLine("");
+      printLine("Type 'help' to see available options.");
       promptTextEl.innerHTML = "";
       promptSymbolEl.className = "prompt";
       promptSymbolEl.innerHTML = "Name <span style=\"color: #0078D4;\">(optional)</span>: ";
@@ -335,9 +335,9 @@ function handleEnter() {
         removeLastLine();
         
         if (SessionContext.lang === "es") {
-          printLine("# Consejo: escriba 'acerca', 'experiencia' o 'help' para comenzar", "comment");
+          printLine("# Consejo: Escriba 'acerca', 'experiencia' o 'help' para comenzar", "comment");
         } else {
-          printLine("# Tip: write 'about', 'experience' or 'help' to begin", "comment");
+          printLine("# Tip: type 'about', 'experience' or 'help' to begin", "comment");
         }
         
         scrollToBottom();
@@ -368,7 +368,7 @@ function handleEnter() {
       } else {
         // Respuesta inválida
         if (SessionContext.lang === "es") {
-          printLine("Por favor responde con 's' (sí) o 'n' (no)", "comment");
+          printLine("Por favor, responde con 's' (sí) o 'n' (no)", "comment");
         } else {
           printLine("Please answer with 'y' (yes) or 'n' (no)", "comment");
         }
@@ -405,11 +405,11 @@ function handleEnter() {
 
     // Mostrar mensaje de bienvenida con el nombre
     if (SessionContext.lang === "es") {
-      printLine(`Bienvenido, ${name}!`);
-      printLine("# Consejo: escriba 'acerca', 'experiencia' o 'help' para comenzar", "comment");
+      printLine(`¡Bienvenido/a, ${name}!`);
+      printLine("# Consejo: Escriba 'acerca', 'experiencia' o 'help' para comenzar", "comment");
     } else {
       printLine(`Welcome, ${name}!`);
-      printLine("# Tip: write 'about', 'experience' or 'help' to begin", "comment");
+      printLine("# Tip: type 'about', 'experience' or 'help' to begin", "comment");
     }
 
     scrollToBottom();

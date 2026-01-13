@@ -11,7 +11,7 @@ const directoryNames = {
   skills: { es: "habilidades", en: "skills" },
   competencies: { es: "competencias", en: "competencies" },
   experience: { es: "experiencia", en: "experience" },
-  education: { es: "educacion", en: "education" },
+  education: { es: "educación", en: "education" },
   projects: { es: "proyectos", en: "projects" },
   contact: { es: "contacto", en: "contact" },
   pdf: { es: "pdf", en: "pdf" }
