@@ -233,6 +233,34 @@ function printLine(text, cssClass = "") {
   output.appendChild(div);
 }
 
+// Renderizado específico para la ayuda en columnas flexibles
+function renderHelp(helpData) {
+  const addSection = (title, items) => {
+    printLine(title);
+    items.forEach(({ cmd, desc }) => {
+      const line = document.createElement("div");
+      line.classList.add("help-line");
+
+      const cmdSpan = document.createElement("span");
+      cmdSpan.classList.add("help-cmd");
+      cmdSpan.textContent = cmd;
+
+      const descSpan = document.createElement("span");
+      descSpan.classList.add("help-desc");
+      descSpan.textContent = desc;
+
+      line.appendChild(cmdSpan);
+      line.appendChild(descSpan);
+      output.appendChild(line);
+    });
+    printLine("");
+  };
+
+  addSection(helpData.primaryTitle, helpData.primary);
+  addSection(helpData.systemTitle, helpData.system);
+  printLine(helpData.note, "comment");
+}
+
 function removeLastLine() {
   if (output.lastChild) {
     output.removeChild(output.lastChild);
@@ -499,8 +527,13 @@ function handleEnter() {
   }
 
   if (result) {
-    if (isAliasCommand || isHelpCommand) {
-      // Espacios para comandos alias o help
+    if (result.type === "help") {
+      // Separación visual para ayuda
+      printLine("");
+      renderHelp(result);
+      printLine("");
+    } else if (isAliasCommand || isHelpCommand) {
+      // Espacios para comandos alias o help en texto plano
       printLine("");
       printLine(result);
       printLine("");

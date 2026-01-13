@@ -34,14 +34,10 @@ const helpCommand = {
       return `${target}\n${cmd.description[context.lang]}`;
     }
 
-    // help (general)
-    const lines = [];
-
-    // 1) Lista de "atajos" (alias) según idioma
+    // help (general) -> devolver estructura para renderizar con columnas
     const lang = context.lang;
     const aliases = Object.keys(aliasRegistry[lang] || {}).sort();
 
-    // Descripciones amigables para alias
     const aliasDescriptions = lang === "es"
       ? {
           acerca: "Ver resumen del CV",
@@ -64,36 +60,27 @@ const helpCommand = {
           pdf: "Show PDF résumé location"
         };
 
-    lines.push(
-      lang === "es" ? "Comandos principales:" : "Primary commands:"
-    );
-    aliases.forEach(name => {
-      const desc = aliasDescriptions[name] || (lang === "es" ? "Comando principal" : "Primary command");
-      lines.push(`${name.padEnd(14)} ${desc}`);
-    });
-
-    lines.push("");
-
-    // 2) Comandos nativos (Linux)
     const LINUX_IDS = new Set(["LS", "CD", "CAT", "PWD", "CLEAR", "ECHO", "HISTORY", "WHOAMI", "HELP", "REBOOT"]);
     const native = commandRegistry.filter(c => LINUX_IDS.has(c.id));
 
-    lines.push(
-      lang === "es" ? "Comandos del sistema (Linux):" : "System commands (Linux):"
-    );
-    native.forEach(cmd => {
-      const name = cmd.aliases[lang][0];
-      const desc = cmd.description[lang];
-      lines.push(`${name.padEnd(14)} ${desc}`);
-    });
-
-    lines.push("");
-    lines.push({
-      es: "Nota: Esta es una simulación controlada. No se ejecutan comandos reales.",
-      en: "Note: This is a controlled simulation. No real system commands are executed."
-    }[lang]);
-
-    return lines.join("\n");
+    return {
+      type: "help",
+      lang,
+      primaryTitle: lang === "es" ? "Comandos principales:" : "Primary commands:",
+      systemTitle: lang === "es" ? "Comandos del sistema (Linux):" : "System commands (Linux):",
+      primary: aliases.map(name => ({
+        cmd: name,
+        desc: aliasDescriptions[name] || (lang === "es" ? "Comando principal" : "Primary command")
+      })),
+      system: native.map(cmd => ({
+        cmd: cmd.aliases[lang][0],
+        desc: cmd.description[lang]
+      })),
+      note: {
+        es: "Nota: Esta es una simulación controlada. No se ejecutan comandos reales.",
+        en: "Note: This is a controlled simulation. No real system commands are executed."
+      }[lang]
+    };
   }
 };
 

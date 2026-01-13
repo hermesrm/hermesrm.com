@@ -46,6 +46,27 @@ body {
   overflow-wrap: anywhere;   /* última defensa contra overflow */
 }
 
+/* Formato de líneas de ayuda en columnas flexibles */
+
+.help-line {
+  display: flex;
+  gap: 16px; /* separa más la descripción del comando */
+  align-items: flex-start;
+}
+
+.help-cmd {
+  flex: 0 0 12ch;
+  color: #c9d1d9;
+  word-break: keep-all;
+}
+
+.help-desc {
+  flex: 1;
+  min-width: 0;
+  color: #c9d1d9;
+  padding-left: 4px;
+}
+
 /* Línea de input */
 .input-line {
   display: flex;
