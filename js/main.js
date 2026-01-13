@@ -54,23 +54,46 @@ const commandRegistry = [
    ============================= */
 
 const USERNAME_MAX_LENGTH = 16;
-const USERNAME_REGEX = /^[a-z0-9]+$/;
-const STORAGE_KEY = "hermesrm_username";
+const PROMPT_USERNAME_REGEX = /^[a-z0-9]+$/; // Solo minúsculas y dígitos, sin espacios
+const STORAGE_KEY_PROMPT = "hermesrm_username"; // nombre seguro para el prompt (sin espacios, minúsculas)
+const STORAGE_KEY_DISPLAY = "hermesrm_username_display"; // nombre formateado para mensajes
+
+// Formatea el nombre para mostrarlo en texto: primera letra en mayúscula de hasta dos palabras
+function formatDisplayName(name) {
+  const safe = (name || "guest").toLowerCase();
+  const words = safe.split(/\s+/).filter(Boolean).slice(0, 2); // máximo dos palabras
+
+  const formatted = words.map((w, idx) => {
+    if (idx < 2 && w.length) {
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    }
+    return w;
+  });
+
+  return formatted.join(" ");
+}
 
 /* =============================
    localStorage helpers
    ============================= */
 
-function saveUsername(name) {
-  localStorage.setItem(STORAGE_KEY, name);
+function saveUsername(promptName, displayName) {
+  localStorage.setItem(STORAGE_KEY_PROMPT, promptName);
+  localStorage.setItem(STORAGE_KEY_DISPLAY, displayName);
 }
 
 function getSavedUsername() {
-  return localStorage.getItem(STORAGE_KEY) || null;
+  const promptName = localStorage.getItem(STORAGE_KEY_PROMPT);
+  const displayName = localStorage.getItem(STORAGE_KEY_DISPLAY);
+  return {
+    prompt: promptName || null,
+    display: displayName || null
+  };
 }
 
 function clearSavedUsername() {
-  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(STORAGE_KEY_PROMPT);
+  localStorage.removeItem(STORAGE_KEY_DISPLAY);
 }
 
 /* =============================
@@ -263,14 +286,16 @@ SessionContext.lang = detectBrowserLang();
    ============================= */
 
 function showWelcome() {
-  const savedName = getSavedUsername();
+  const saved = getSavedUsername();
   
-  if (savedName) {
+  if (saved.prompt) {
     // Hay nombre guardado - preguntar si continuar con él
-    SessionContext.visitor.name = savedName;
+    SessionContext.visitor.name = saved.prompt; // Prompt seguro: minúsculas, sin espacios
     savedUsernameMode = true;
+
+    const displayName = saved.display || formatDisplayName(saved.prompt);
     
-    printLine(`¡Bienvenido/a de vuelta, ${savedName}!`);
+    printLine(`¡Bienvenido/a de vuelta, ${displayName}!`);
     printLine("");
     printLine(SessionContext.lang === "es" ? "¿Deseas continuar con este nombre de usuario? (s/n)" : "Do you want to continue with this username? (y/n)");
     
@@ -379,20 +404,34 @@ function handleEnter() {
     }
     
     // Modo: Ingresar nombre por primera vez o nuevo
-    let name = rawInput.trim().toLowerCase();
-    name = name.replace(/\s+/g, "");
+    const rawName = rawInput.trim();
 
-    if (!name) {
-      name = "guest";
+    // Para mostrar: permitir letras (incluyendo acentos), números y espacios; colapsar múltiples
+    const displaySource = rawName
+      .replace(/[^\p{L}\p{N}\s]/gu, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    // Para el prompt: minúsculas, sin espacios ni acentos
+    let promptName = displaySource
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // quitar diacríticos
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
+
+    if (!promptName) {
+      promptName = "guest";
     } else {
-      name = name.slice(0, USERNAME_MAX_LENGTH);
-      if (!USERNAME_REGEX.test(name)) {
-        name = "guest";
+      promptName = promptName.slice(0, USERNAME_MAX_LENGTH);
+      if (!PROMPT_USERNAME_REGEX.test(promptName)) {
+        promptName = "guest";
       }
     }
 
-    SessionContext.visitor.name = name;
-    saveUsername(name); // Guardar en localStorage
+    const displayName = formatDisplayName(displaySource || promptName);
+
+    SessionContext.visitor.name = promptName;
+    saveUsername(promptName, displayName); // Guardar en localStorage
     awaitingName = false;
 
     // Si estamos cambiando de un nombre anterior, borrar las líneas previas
@@ -406,10 +445,10 @@ function handleEnter() {
 
     // Mostrar mensaje de bienvenida con el nombre
     if (SessionContext.lang === "es") {
-      printLine(`¡Bienvenido/a, ${name}!`);
+      printLine(`¡Bienvenido/a, ${displayName}!`);
       printLine("# Consejo: Escriba 'acerca', 'experiencia' o 'help' para comenzar", "comment");
     } else {
-      printLine(`Welcome, ${name}!`);
+      printLine(`Welcome, ${displayName}!`);
       printLine("# Tip: type 'about', 'experience' or 'help' to begin", "comment");
     }
 
