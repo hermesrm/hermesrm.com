@@ -74,34 +74,35 @@ advanced support, process automation, and Microsoft 365 environment management.`
               type: "file",
               name: "content",
               content: {
-                es: `SISTEMAS Y PLATAFORMAS
-- Windows Server
-- Linux (CLI)
-- Microsoft 365
-- Active Directory / Entra ID
-- Intune
-
-AUTOMATIZACIÓN Y SCRIPTING
-- PowerShell
-- Bash
-
-SEGURIDAD Y BUENAS PRÁCTICAS
-- Principio de mínimo privilegio
-- Gestión de identidades`,
-                en: `SYSTEMS AND PLATFORMS
-- Windows Server
-- Linux (CLI)
-- Microsoft 365
-- Active Directory / Entra ID
-- Intune
-
-AUTOMATION AND SCRIPTING
-- PowerShell
-- Bash
-
-SECURITY AND BEST PRACTICES
-- Principle of least privilege
-- Identity management`
+                es: `- Microsoft 365 / Entra (identidades, licencias, accesos, MFA, roles, auditoría)
+- Exchange Online (mail flow, reglas de transporte, moderación, NDR, alertas)
+- SharePoint / OneDrive / Teams (permisos, sincronización, herencia, accesos externos)
+- Intune / MDM (inscripción y administración de equipos, perfiles, apps, cumplimiento)
+- Migraciones (Google Workspace → Microsoft 365: datos, correo, dominio, adopción)
+- Windows / Linux (instalación, configuración, perfiles, troubleshooting)
+- NAS Synology (usuarios, permisos, carpetas compartidas, sincronización bidireccional)
+- Seguridad (alertas, políticas, control de adjuntos, protección de datos)
+- Monitorización (pfSense, Unifi, M365, Entra, NAS)
+- Automatización (PowerShell asistido, flujos puntuales)
+- Virtualización / Contenedores (VirtualBox labs, Proxmox básico, Docker básico)
+- ISO 9001 (procesos, procedimientos, control documental)
+- Redes (nivel operativo) (TCP/IP, configuración de IPs estáticas, diagnóstico de conectividad, filtrado MAC, gestión básica de switches)
+- Ofimática (Excel, Word, PowerPoint)
+`,
+                en: `- Microsoft 365 / Entra (identities, licensing, access, MFA, roles, auditing)
+- Exchange Online (mail flow, transport rules, moderation, NDR, alerts)
+- SharePoint / OneDrive / Teams (permissions, sync, inheritance, external access)
+- Intune / MDM (device enrollment and management, profiles, apps, compliance)
+- Migrations (Google Workspace → Microsoft 365: data, email, domain, adoption)
+- Windows / Linux (installation, configuration, profiles, troubleshooting)
+- Synology NAS (users, permissions, shared folders, bidirectional sync)
+- Security (alerts, policies, attachment control, data protection)
+- Monitoring (pfSense, Unifi, M365, Entra, NAS)
+- Automation (assisted PowerShell, targeted workflows)
+- Virtualization / Containers (VirtualBox labs, basic Proxmox, basic Docker)
+- ISO 9001 (processes, procedures, document control)
+- Networking (operational level) (TCP/IP, static IP configuration, connectivity diagnostics, MAC filtering, basic switch management)
+- Office productivity (Excel, Word, PowerPoint)`
               }
             }
           }
