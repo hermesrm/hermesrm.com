@@ -585,10 +585,13 @@ async function handleEnter() {
    ============================= */
 
 // Forzar minúscula en dispositivos móviles que capitalizan automáticamente
+// (solo cuando NO estamos pidiendo el nombre)
 inputEl.addEventListener("input", (e) => {
-  const value = inputEl.value;
-  if (value.length > 0 && value[0] === value[0].toUpperCase() && value[0] !== value[0].toLowerCase()) {
-    inputEl.value = value[0].toLowerCase() + value.slice(1);
+  if (!awaitingName) {
+    const value = inputEl.value;
+    if (value.length > 0 && value[0] === value[0].toUpperCase() && value[0] !== value[0].toLowerCase()) {
+      inputEl.value = value[0].toLowerCase() + value.slice(1);
+    }
   }
 });
 
