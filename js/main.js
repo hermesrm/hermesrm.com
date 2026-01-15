@@ -8,7 +8,7 @@ import { executeInput, resolveAlias, tokenize } from "./parser.js";
 import { aliasRegistry } from "./aliases.js";
 
 // Commands
-import { lsCommand } from "./commands/ls.js";
+import { lsCommand, getDisplayName } from "./commands/ls.js";
 import { cdCommand } from "./commands/cd.js";
 import { catCommand } from "./commands/cat.js";
 import { helpCommand } from "./commands/help.js";
@@ -179,9 +179,16 @@ function getPathCompletions(pathPrefix, context) {
     }
     
     const items = Object.keys(currentNode.children || {});
-    const matches = items.filter(name => name.startsWith(pathPrefix));
+    // Traducir nombres y filtrar por lo que el usuario escribió
+    const displayItems = items.map(name => ({
+      raw: name,
+      display: getDisplayName(name, context.lang)
+    }));
     
-    return matches.map(name => baseDir + name);
+    const matches = displayItems.filter(item => item.display.startsWith(pathPrefix));
+    
+    // Devolver nombres traducidos para mostrar
+    return matches.map(item => baseDir + item.display);
   } catch (err) {
     console.error("Error en getPathCompletions:", err);
     return [];
@@ -233,11 +240,11 @@ function printLine(text, cssClass = "") {
   output.appendChild(div);
 }
 
-// Renderizado específico para la ayuda en columnas flexibles
-function renderHelp(helpData) {
-  const addSection = (title, items) => {
+// Renderizado específico para la ayuda en columnas flexibles - animado
+async function renderHelp(helpData) {
+  const addSection = async (title, items) => {
     printLine(title);
-    items.forEach(({ cmd, desc }) => {
+    for (const { cmd, desc } of items) {
       const line = document.createElement("div");
       line.classList.add("help-line");
 
@@ -252,13 +259,29 @@ function renderHelp(helpData) {
       line.appendChild(cmdSpan);
       line.appendChild(descSpan);
       output.appendChild(line);
-    });
+      scrollToBottom();
+      await new Promise(resolve => setTimeout(resolve, 40)); // pequeño delay entre items
+    }
     printLine("");
   };
 
-  addSection(helpData.primaryTitle, helpData.primary);
-  addSection(helpData.systemTitle, helpData.system);
+  await addSection(helpData.primaryTitle, helpData.primary);
+  await addSection(helpData.systemTitle, helpData.system);
   printLine(helpData.note, "comment");
+}
+
+// Imprime contenido animado carácter por carácter (máquina de escribir)
+async function printAnimated(text, delay = 3) {
+  const div = document.createElement("div");
+  div.style.whiteSpace = "pre-wrap";
+  div.style.wordBreak = "break-word";
+  output.appendChild(div);
+  
+  for (let i = 0; i < text.length; i++) {
+    div.textContent += text[i];
+    scrollToBottom();
+    await new Promise(resolve => setTimeout(resolve, delay));
+  }
 }
 
 function removeLastLine() {
@@ -372,7 +395,7 @@ let awaitingName = true;
 let savedUsernameMode = false; // Para detectar si estamos en modo "aceptar nombre previo"
 let changingName = false; // Para detectar si estamos cambiando de un nombre previo
 
-function handleEnter() {
+async function handleEnter() {
   const rawInput = inputEl.value;
   inputEl.value = "";
   clearSuggestions();
@@ -527,19 +550,24 @@ function handleEnter() {
   }
 
   if (result) {
-    if (result.type === "help") {
-      // Separación visual para ayuda
+    if (result.type === "animated") {
+      // Contenido animado (filesystem: acerca, experiencia, etc.)
       printLine("");
-      renderHelp(result);
+      await printAnimated(result.text);
+      printLine("");
+    } else if (result.type === "help") {
+      // Separación visual para ayuda - animado
+      printLine("");
+      await renderHelp(result);
       printLine("");
     } else if (isAliasCommand || isHelpCommand) {
-      // Espacios para comandos alias o help en texto plano
+      // Espacios para comandos alias o help en texto plano - animado
       printLine("");
-      printLine(result);
+      await printAnimated(result);
       printLine("");
     } else {
-      // Sin espacios extra para comandos nativos
-      printLine(result);
+      // Sin espacios extra para comandos nativos - animado
+      await printAnimated(result);
     }
   }
   

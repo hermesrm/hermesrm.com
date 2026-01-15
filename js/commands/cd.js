@@ -4,6 +4,7 @@
    ============================= */
 
 import { resolvePath } from "../context.js";
+import { getInternalName } from "./ls.js";
 
 const cdCommand = {
   id: "CD",
@@ -17,7 +18,11 @@ const cdCommand = {
   },
 
   execute(context, args) {
-    const target = args[0] || "/";
+    let target = args[0] || "/";
+    
+    // Traducir el argumento del nombre mostrado al nombre raw del filesystem
+    target = getInternalName(target, context.lang);
+    
     const result = resolvePath(context, target);
 
     if (!result) {

@@ -21,6 +21,18 @@ function getDisplayName(name, lang) {
   return directoryNames[name]?.[lang] || name;
 }
 
+// Función inversa: convierte nombre traducido al nombre raw del filesystem
+function getInternalName(displayName, lang) {
+  // Buscar en el mapeo inverso
+  for (const [raw, translations] of Object.entries(directoryNames)) {
+    if (translations[lang] === displayName) {
+      return raw;
+    }
+  }
+  // Si no encuentra, asumir que es el nombre raw
+  return displayName;
+}
+
 const lsCommand = {
   id: "LS",
   aliases: {
@@ -62,4 +74,4 @@ const lsCommand = {
   }
 };
 
-export { lsCommand };
+export { lsCommand, getDisplayName, getInternalName };

@@ -4,6 +4,7 @@
    ============================= */
 
 import { resolveNode } from "../context.js";
+import { getInternalName } from "./ls.js";
 
 const catCommand = {
   id: "CAT",
@@ -24,7 +25,10 @@ const catCommand = {
       }[context.lang];
     }
 
-    const target = args[0];
+    // Traducir el argumento del nombre mostrado al nombre raw del filesystem
+    let target = args[0];
+    target = getInternalName(target, context.lang);
+    
     const node = resolveNode(context, target);
 
     if (!node) {
@@ -34,17 +38,25 @@ const catCommand = {
       }[context.lang];
     }
 
-    // Directorio de sección del CV (content interno)
+    // Directorio de sección del CV (content interno) - devolver como animado
     if (node.type === "dir" && node.children?.content) {
-      return node.children.content.content[context.lang] || "";
+      const text = node.children.content.content[context.lang] || "";
+      return {
+        type: "animated",
+        text: text
+      };
     }
 
-    // Archivo multilenguaje explícito
+    // Archivo multilenguaje explícito - devolver como animado
     if (node.type === "file" && node.content) {
-      return node.content[context.lang] || {
+      const text = node.content[context.lang] || {
         es: "Idioma no disponible",
         en: "Language not available"
       }[context.lang];
+      return {
+        type: "animated",
+        text: text
+      };
     }
 
     return {
