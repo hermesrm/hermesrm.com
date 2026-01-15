@@ -6,8 +6,8 @@
 import { fileSystem } from "./filesystem.js";
 
 /*
-  SessionContext mantiene TODO el estado vivo de la sesión.
-  Ningún comando debe guardar estado fuera de este objeto.
+  ES: SessionContext almacena todo el estado vivo de la sesión; no guardar estado fuera de aquí.
+  EN: SessionContext holds all live session state; do not persist state outside this object.
 */
 
 const SessionContext = {
@@ -25,7 +25,7 @@ const SessionContext = {
    Helpers de contexto
    ============================= */
 
-/* Resuelve el nodo actual a partir de cwd */
+/* ES: Resuelve el nodo actual desde cwd. EN: Resolve current node from cwd. */
 function resolveCwd(context = SessionContext) {
   let node = context.fs;
 
@@ -39,13 +39,13 @@ function resolveCwd(context = SessionContext) {
   return node;
 }
 
-/* Devuelve la ruta actual como string (solo presentación) */
+/* ES: Ruta actual como string (solo para mostrar). EN: Current path string for display. */
 function getCwdPath(context = SessionContext) {
   if (!context.cwd.length) return "/";
   return "/" + context.cwd.join("/");
 }
 
-/* Resuelve una ruta a un directorio (para cd) */
+/* ES: Resuelve una ruta a un directorio (cd). EN: Resolve a path to a directory (cd). */
 function resolvePath(context, path) {
   let parts;
   let node;
@@ -92,7 +92,7 @@ function resolvePath(context, path) {
   return { node, cwd: newCwd };
 }
 
-/* Resuelve una ruta a un nodo (archivo o directorio) */
+/* ES: Resuelve una ruta a un nodo (archivo o dir). EN: Resolve a path to a node (file or dir). */
 function resolveNode(context, path) {
   let parts;
   let node;

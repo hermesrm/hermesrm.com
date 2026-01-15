@@ -48,6 +48,9 @@
 ### Recomendaciones
 - Mantener las traducciones en ambos idiomas coherentes.
 - Para mejorar autocompletado de rutas y/o añadir fuzzy matching, editar `getPathCompletions` y `getCompletions` en `main.js`.
+- La impresión de comandos se sanea; conservar `textContent` al extenderla para evitar XSS.
+- En móviles se fuerza minúscula inicial solo fuera del flujo de nombre; si cambias el prompt, revisa el handler en `main.js`.
+- No hay pruebas automatizadas; si las agregas, usa una carpeta dedicada y evita dejar dependencias si no se usarán.
 
 ---
 
@@ -99,3 +102,6 @@
 ### Recommendations
 - Keep translations synchronized between both languages.
 - To improve path autocompletion or add fuzzy search, modify `getPathCompletions` and `getCompletions` in `main.js`.
+- Command echo is sanitized; keep using `textContent` when extending to avoid XSS.
+- On mobile, lowercase forcing applies only after name entry; if you change the prompt flow, revisit the handler in `main.js`.
+- No automated tests are included; if you add them, keep dependencies isolated and remove them if not needed.

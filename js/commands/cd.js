@@ -20,7 +20,7 @@ const cdCommand = {
   execute(context, args) {
     let target = args[0] || "/";
     
-    // Traducir el argumento del nombre mostrado al nombre raw del filesystem
+    // ES: Traduce nombre mostrado al nombre interno del filesystem. EN: Translate display name to raw FS name.
     target = getInternalName(target, context.lang);
     
     const result = resolvePath(context, target);

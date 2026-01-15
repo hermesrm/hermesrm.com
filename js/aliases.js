@@ -4,14 +4,10 @@
    ============================= */
 
 /*
-  Los alias NO contienen lógica.
-  Simplemente redirigen una entrada directa
-  a un comando real existente.
-  
-  Cada alias está segmentado por idioma:
-  - Los alias en "en" solo se sugieren cuando el idioma es inglés
-  - Los alias en "es" solo se sugieren cuando el idioma es español
-  - El autocompletado filtra por idioma activo
+  ES: Los alias no contienen lógica; redirigen input directo a comandos reales.
+      Segmentados por idioma (en/es) y filtrados por autocompletado según idioma activo.
+  EN: Aliases carry no logic; they redirect raw input to real commands.
+      Segmented by language (en/es) and filtered by autocomplete for active language.
 */
 
 const aliasRegistry = {

@@ -25,7 +25,7 @@ const catCommand = {
       }[context.lang];
     }
 
-    // Traducir el argumento del nombre mostrado al nombre raw del filesystem
+    // ES: Traduce nombre mostrado al nombre interno del filesystem. EN: Translate display name to raw FS name.
     let target = args[0];
     target = getInternalName(target, context.lang);
     

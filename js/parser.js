@@ -6,8 +6,8 @@
 import { aliasRegistry } from "./aliases.js";
 
 /*
-  Resuelve alias simples antes de procesar el comando.
-  Solo se aplica si el input completo coincide con un alias.
+  ES: Resuelve alias simples antes de procesar; aplica solo si el input completo coincide.
+  EN: Resolves simple aliases before processing; only when full input matches.
 */
 function resolveAlias(input, lang = "es") {
   const trimmed = input.trim();
@@ -15,9 +15,8 @@ function resolveAlias(input, lang = "es") {
 }
 
 /*
-  Tokeniza la entrada:
-  - Primer token: comando
-  - Resto: argumentos
+  ES: Tokeniza entrada: primer token comando, resto argumentos.
+  EN: Tokenize input: first token command, rest arguments.
 */
 function tokenize(input) {
   const tokens = input.trim().split(/\s+/);
@@ -28,8 +27,8 @@ function tokenize(input) {
 }
 
 /*
-  Ejecuta un comando a partir del registro.
-  Devuelve string (salida) o string vacío.
+  ES: Ejecuta un comando desde el registro; devuelve string de salida (o vacío).
+  EN: Executes a registry command; returns output string (or empty).
 */
 function executeInput(rawInput, context, commandRegistry) {
   if (!rawInput.trim()) return "";

@@ -234,10 +234,11 @@ function scrollToBottom() {
 
 function printLine(text, cssClass = "") {
   const div = document.createElement("div");
-  // Asegurar que las líneas en blanco se rendericen visualmente
+  // ES: Espacio duro mantiene visibles las líneas en blanco. EN: Non-breaking space keeps blank lines visible.
   div.textContent = (text === "" ? "\u00A0" : text);
   if (cssClass) div.classList.add(cssClass);
   output.appendChild(div);
+  return div;
 }
 
 // Renderizado específico para la ayuda en columnas flexibles - animado
@@ -291,14 +292,27 @@ function removeLastLine() {
 }
 
 function printCommandHistory(userHost, path, command) {
-  // Primera línea: prompt con colores
+  // ES: Renderiza el prompt evitando HTML del usuario. EN: Renders prompt without injecting user HTML.
   const promptDiv = document.createElement("div");
-  promptDiv.innerHTML = `<span class="prompt">${userHost}</span> <span class="prompt-path">${path}</span>`;
+  const userSpan = document.createElement("span");
+  userSpan.className = "prompt";
+  userSpan.textContent = userHost;
+  const pathSpan = document.createElement("span");
+  pathSpan.className = "prompt-path";
+  pathSpan.textContent = ` ${path}`;
+  promptDiv.appendChild(userSpan);
+  promptDiv.appendChild(pathSpan);
   output.appendChild(promptDiv);
-  
-  // Segunda línea: comando con $
+
+  // ES: Comando con símbolo, saneado. EN: Command line with symbol, sanitized.
   const commandDiv = document.createElement("div");
-  commandDiv.innerHTML = `<span class="prompt-symbol">$</span> ${command}`;
+  const symbolSpan = document.createElement("span");
+  symbolSpan.className = "prompt-symbol";
+  symbolSpan.textContent = "$";
+  const textSpan = document.createElement("span");
+  textSpan.textContent = ` ${command}`;
+  commandDiv.appendChild(symbolSpan);
+  commandDiv.appendChild(textSpan);
   output.appendChild(commandDiv);
 }
 
@@ -338,6 +352,10 @@ SessionContext.lang = detectBrowserLang();
    Welcome message
    ============================= */
 
+// ES: Nodo que muestra la instrucción de introducir nombre; se elimina al capturar el nombre.
+// EN: Node holding the name instruction line; removed after the name is captured.
+let nameHintNode = null;
+
 function showWelcome() {
   const saved = getSavedUsername();
   
@@ -370,7 +388,7 @@ function showWelcome() {
       printLine("");
       printLine("Puede explorar el perfil mediante la simulación de comandos.");
       printLine("");
-      printLine("Introduzca su nombre si desea personalizar la sesión.");
+      nameHintNode = printLine("Introduzca su nombre si desea personalizar la sesión."); // ES: Se remueve tras capturar. EN: Removed after capture.
       promptTextEl.innerHTML = "";
       promptSymbolEl.className = "prompt";
       promptSymbolEl.innerHTML = "Nombre <span style=\"color: #0078D4;\">(opcional)</span>: ";
@@ -381,7 +399,7 @@ function showWelcome() {
       printLine("");
       printLine("Explore the profile through simulated commands.");
       printLine("");
-      printLine("Enter your name if you want to personalize the session.");
+      nameHintNode = printLine("Enter your name if you want to personalize the session."); // ES: Se remueve tras capturar. EN: Removed after capture.
       promptTextEl.innerHTML = "";
       promptSymbolEl.className = "prompt";
       promptSymbolEl.innerHTML = "Name <span style=\"color: #0078D4;\">(optional)</span>: ";
@@ -489,8 +507,13 @@ async function handleEnter() {
     saveUsername(promptName, displayName); // Guardar en localStorage
     awaitingName = false;
 
-    // Eliminar la línea de instrucción del nombre
-    removeLastLine();
+    // ES: Elimina la línea de instrucción del nombre si sigue presente. EN: Remove the name hint line if still present.
+    if (nameHintNode?.isConnected) {
+      nameHintNode.remove();
+      nameHintNode = null;
+    } else {
+      removeLastLine();
+    }
 
     // Si estamos cambiando de un nombre anterior, borrar las líneas previas
     if (changingName) {
@@ -584,13 +607,16 @@ async function handleEnter() {
    History navigation (↑ ↓)
    ============================= */
 
-// Forzar minúscula en dispositivos móviles que capitalizan automáticamente
-// (solo cuando NO estamos pidiendo el nombre)
-inputEl.addEventListener("input", (e) => {
+// ES: Fuerza minúscula inicial en móviles que capitalizan, solo fuera del flujo de nombre y en el primer token.
+// EN: Forces lowercase first char on mobile auto-cap, only after name entry and only on the first token.
+inputEl.addEventListener("input", () => {
   if (!awaitingName) {
     const value = inputEl.value;
-    if (value.length > 0 && value[0] === value[0].toUpperCase() && value[0] !== value[0].toLowerCase()) {
+    const caret = inputEl.selectionStart || 0;
+    const isFirstToken = !value.includes(" ");
+    if (isFirstToken && caret <= 1 && value.length > 0 && value[0] === value[0].toUpperCase() && value[0] !== value[0].toLowerCase()) {
       inputEl.value = value[0].toLowerCase() + value.slice(1);
+      inputEl.setSelectionRange(caret, caret);
     }
   }
 });

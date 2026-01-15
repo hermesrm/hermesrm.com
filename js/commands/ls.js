@@ -5,7 +5,7 @@
 
 import { resolveCwd } from "../context.js";
 
-// Mapeo de nombres de directorios por idioma
+// ES: Mapeo de nombres de directorios por idioma. EN: Directory name mapping per language.
 const directoryNames = {
   about: { es: "acerca", en: "about" },
   skills: { es: "habilidades", en: "skills" },

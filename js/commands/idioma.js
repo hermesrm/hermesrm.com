@@ -3,6 +3,7 @@
    Language selection command
    ============================= */
 
+// ES: Idiomas soportados. EN: Supported languages.
 const SUPPORTED_LANGS = ["es", "en"];
 
 const languageCommand = {

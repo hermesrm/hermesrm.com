@@ -34,7 +34,7 @@ const helpCommand = {
       return `${target}\n${cmd.description[context.lang]}`;
     }
 
-    // help (general) -> devolver estructura para renderizar con columnas
+    // ES: help general devuelve estructura para render en columnas. EN: General help returns structure for column render.
     const lang = context.lang;
     const aliases = Object.keys(aliasRegistry[lang] || {}).sort();
 

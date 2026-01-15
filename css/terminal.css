@@ -1,6 +1,8 @@
 /* =============================
-   Terminal CSS — hermesrm.com
-   ============================= */
+  Terminal CSS — hermesrm.com
+  ES: Estilos base de la terminal simulada.
+  EN: Base styles for the simulated terminal.
+  ============================= */
 
 /* Reset mínimo */
 * {
@@ -121,12 +123,16 @@ body {
   text-shadow: 0 0 0 #ffffff;
 }
 
-/* Comentarios tipo shell (ej. tips) */
+/* Comentarios tipo shell (ej. tips)
+   ES: Colores alineados a convenciones de terminal con contraste legible.
+   EN: Colors aligned with terminal conventions and readable contrast. */
 .comment {
   color: #8b949e;
 }
 
-/* Errores */
+/* Errores
+   ES: Color de error visible sobre fondo oscuro.
+   EN: Error color chosen for visibility on dark background. */
 .error {
   color: #f85149;
 }

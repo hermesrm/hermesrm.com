@@ -4,10 +4,10 @@
    ============================= */
 
 /*
-  Estructura:
-  - Directorios (type: 'dir') con children
-  - Archivos lógicos multilenguaje (type: 'file')
-  - El archivo interno 'content' NO es visible para el usuario
+  ES: Estructura virtual: dirs (type 'dir') con children; archivos multilenguaje (type 'file').
+      El nodo interno 'content' no se expone al usuario, solo sirve para el render.
+  EN: Virtual structure: dirs (type 'dir') with children; multilingual files (type 'file').
+      Internal 'content' nodes are not exposed to the user, only used for rendering.
 */
 
 const fileSystem = {
