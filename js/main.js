@@ -366,20 +366,22 @@ function showWelcome() {
     if (SessionContext.lang === "es") {
       printLine("¡Bienvenido/a a hermesrm.com!");
       printLine("");
-      printLine("Currículum interactivo en modo consola.");
-      printLine("Puede explorar el perfil usando comandos.");
+      printLine("Perfil interactivo en modo CLI (Command‑Line Interface)");
       printLine("");
-      printLine("Escriba 'help' para ver las opciones disponibles.");
+      printLine("Puede explorar el perfil mediante la simulación de comandos.");
+      printLine("");
+      printLine("Introduzca su nombre si desea personalizar la sesión.");
       promptTextEl.innerHTML = "";
       promptSymbolEl.className = "prompt";
       promptSymbolEl.innerHTML = "Nombre <span style=\"color: #0078D4;\">(opcional)</span>: ";
     } else {
       printLine("Welcome to hermesrm.com!");
       printLine("");
-      printLine("Interactive résumé in console mode.");
-      printLine("You can explore the profile using commands.");
+      printLine("Interactive CLI‑Mode Profile (Command‑Line Interface)");
       printLine("");
-      printLine("Type 'help' to see available options.");
+      printLine("Explore the profile through simulated commands.");
+      printLine("");
+      printLine("Enter your name if you want to personalize the session.");
       promptTextEl.innerHTML = "";
       promptSymbolEl.className = "prompt";
       promptSymbolEl.innerHTML = "Name <span style=\"color: #0078D4;\">(optional)</span>: ";
@@ -414,9 +416,9 @@ async function handleEnter() {
         removeLastLine();
         
         if (SessionContext.lang === "es") {
-          printLine("# Consejo: Escriba 'acerca', 'experiencia' o 'help' para comenzar", "comment");
+          printLine("# Introduzca 'acerca' o 'contacto' para comenzar; 'help' muestra todos los comandos.", "comment");
         } else {
-          printLine("# Tip: type 'about', 'experience' or 'help' to begin", "comment");
+          printLine("# Type 'about' or 'contact' to begin; 'help' shows all commands.", "comment");
         }
         
         scrollToBottom();
