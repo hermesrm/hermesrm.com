@@ -1,4 +1,4 @@
-# hermesrm.com — Interactive CV (Terminal UI)
+# HermesRM - CLI Profile
 
 ## Español
 
