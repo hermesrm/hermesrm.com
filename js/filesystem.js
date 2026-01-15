@@ -26,14 +26,24 @@ const fileSystem = {
               type: "file",
               name: "content",
               content: {
-                es: `Administrador de Infraestructura Digital e Innovación Tecnológica.
+                es: `Administrador de sistemas con experiencia en la gestión de proyectos estratégicos en el sector privado y en administraciones públicas. He evolucionado desde la coordinación operativa y el análisis de procesos empresariales hacia la administración avanzada de entornos tecnológicos híbridos, con un enfoque integral en seguridad, eficiencia y continuidad operativa.
 
-Especialista en administración de sistemas, Microsoft 365, automatización y mejora continua.
-Enfoque en seguridad, buenas prácticas y diseño de soluciones mantenibles.`,
-                en: `Digital Infrastructure and Technology Innovation Administrator.
+Actualmente lidero la modernización de infraestructura en el sector salud, administrando Microsoft 365 (Entra ID, Intune, SharePoint, Teams, Exchange Online), Active Directory local y redes corporativas seguras y escalables. He implementado políticas de seguridad, proyectos de migración, modernización de centros de datos, virtualización y soluciones de respaldo, garantizando la confidencialidad, integridad y disponibilidad de la información.
 
-Specialized in systems administration, Microsoft 365, automation, and continuous improvement.
-Focused on security, best practices, and maintainable solution design.`
+Mi propuesta de valor se basa en:
+- Integrar negocio y tecnología, traduciendo necesidades estratégicas en soluciones técnicas efectivas.
+- Optimizar procesos mediante automatización, estandarización y control auditable.
+- Fortalecer la seguridad y la continuidad operativa en entornos corporativos complejos.
+- Impulsar la innovación con visión institucional, asegurando eficiencia y sostenibilidad tecnológica a largo plazo.`,
+                en: `Systems administrator with experience managing strategic projects in the private sector and public administrations. I have evolved from operational coordination and business process analysis to advanced administration of hybrid technological environments, with a comprehensive focus on security, efficiency, and operational continuity.
+
+I am currently leading infrastructure modernization in the healthcare sector, administering Microsoft 365 (Entra ID, Intune, SharePoint, Teams, Exchange Online), on‑premises Active Directory, and secure, scalable corporate networks. I have implemented security policies, migration projects, data center modernization, virtualization, and backup solutions, ensuring the confidentiality, integrity, and availability of information.
+
+My value proposition is based on:
+- Integrating business and technology, translating strategic needs into effective technical solutions.
+- Optimizing processes through automation, standardization, and auditable control.
+- Strengthening security and operational continuity in complex corporate environments.
+- Driving innovation with an institutional vision, ensuring long‑term technological efficiency and sustainability.`
               }
             }
           }
