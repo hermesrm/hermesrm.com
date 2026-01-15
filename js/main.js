@@ -489,6 +489,9 @@ async function handleEnter() {
     saveUsername(promptName, displayName); // Guardar en localStorage
     awaitingName = false;
 
+    // Eliminar la línea de instrucción del nombre
+    removeLastLine();
+
     // Si estamos cambiando de un nombre anterior, borrar las líneas previas
     if (changingName) {
       removeLastLine(); // Remove: "Ingrese un nuevo nombre:" / "Enter a new name:"
@@ -501,10 +504,10 @@ async function handleEnter() {
     // Mostrar mensaje de bienvenida con el nombre
     if (SessionContext.lang === "es") {
       printLine(`¡Bienvenido/a, ${displayName}!`);
-      printLine("# Consejo: Escriba 'acerca', 'experiencia' o 'help' para comenzar", "comment");
+      printLine("# Introduzca 'acerca' o 'contacto' para comenzar; 'help' muestra todos los comandos.", "comment");
     } else {
       printLine(`Welcome, ${displayName}!`);
-      printLine("# Tip: type 'about', 'experience' or 'help' to begin", "comment");
+      printLine("# Type 'about' or 'contact' to begin; 'help' shows all commands.", "comment");
     }
 
     scrollToBottom();
