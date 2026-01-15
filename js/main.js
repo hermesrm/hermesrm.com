@@ -608,15 +608,29 @@ async function handleEnter() {
    History navigation (↑ ↓)
    ============================= */
 
-// ES: Fuerza minúscula inicial en móviles que capitalizan, solo fuera del flujo de nombre y en el primer token.
-// EN: Forces lowercase first char on mobile auto-cap, only after name entry and only on the first token.
+// ES: Fuerza minúscula en móviles que capitalizan automáticamente: primer carácter y después de espacios.
+// EN: Forces lowercase on mobile auto-cap: first char and after spaces to prevent word capitalization.
 inputEl.addEventListener("input", () => {
   if (!awaitingName) {
-    const value = inputEl.value;
-    const caret = inputEl.selectionStart || 0;
-    const isFirstToken = !value.includes(" ");
-    if (isFirstToken && caret <= 1 && value.length > 0 && value[0] === value[0].toUpperCase() && value[0] !== value[0].toLowerCase()) {
-      inputEl.value = value[0].toLowerCase() + value.slice(1);
+    let value = inputEl.value;
+    let modified = false;
+
+    // Fuerza minúscula en el primer carácter si es mayúscula
+    if (value.length > 0 && value[0] === value[0].toUpperCase() && value[0] !== value[0].toLowerCase()) {
+      value = value[0].toLowerCase() + value.slice(1);
+      modified = true;
+    }
+
+    // Fuerza minúscula en caracteres que siguen espacios (previene autocap de móviles entre palabras)
+    const corrected = value.replace(/ ([A-Z])/g, (match, char) => " " + char.toLowerCase());
+    if (corrected !== value) {
+      value = corrected;
+      modified = true;
+    }
+
+    if (modified) {
+      const caret = inputEl.selectionStart || 0;
+      inputEl.value = value;
       inputEl.setSelectionRange(caret, caret);
     }
   }
