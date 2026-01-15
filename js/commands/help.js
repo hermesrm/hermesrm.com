@@ -36,28 +36,28 @@ const helpCommand = {
 
     // ES: help general devuelve estructura para render en columnas. EN: General help returns structure for column render.
     const lang = context.lang;
-    const aliases = Object.keys(aliasRegistry[lang] || {}).sort();
+    const aliases = Object.keys(aliasRegistry[lang] || {}); // Mantiene orden definido en aliases.js
 
     const aliasDescriptions = lang === "es"
       ? {
-          acerca: "Ver resumen del CV",
-          habilidades: "Ver habilidades",
-          competencias: "Ver competencias",
-          experiencia: "Ver experiencia",
-          educacion: "Ver educación",
-          proyectos: "Ver proyectos",
-          contacto: "Ver contacto",
-          pdf: "Mostrar ubicación del CV en PDF"
+          acerca: "Acerca de mí",
+          habilidades: "Habilidades técnicas",
+          competencias: "Competencias profesionales",
+          experiencia: "Experiencia laboral",
+          educacion: "Formación",
+          proyectos: "Proyectos personales",
+          contacto: "Información de contacto",
+          pdf: "Ubicación del CV en PDF"
         }
       : {
-          about: "View CV overview",
-          skills: "View skills",
-          competencies: "View competencies",
-          experience: "View experience",
-          education: "View education",
-          projects: "View projects",
-          contact: "View contact info",
-          pdf: "Show PDF résumé location"
+          about: "About me",
+          habilidades: "Technical skills",
+          competencias: "Professional competencies",
+          experiencia: "Work experience",
+          educacion: "Education",
+          proyectos: "Personal projects",
+          contacto: "Contact information",
+          pdf: "PDF CV location"
         };
 
     const LINUX_IDS = new Set(["LS", "CD", "CAT", "PWD", "CLEAR", "ECHO", "HISTORY", "WHOAMI", "HELP", "REBOOT"]);

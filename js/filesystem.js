@@ -57,10 +57,8 @@ My value proposition is based on:
               type: "file",
               name: "content",
               content: {
-                es: `Experiencia profesional centrada en la administración de infraestructura TI,
-soporte avanzado, automatización de procesos y gestión de entornos Microsoft 365.`,
-                en: `Professional experience focused on IT infrastructure administration,
-advanced support, process automation, and Microsoft 365 environment management.`
+                es: `Estado: módulo en construcción.`,
+                en: `Status: module under construction.`
               }
             }
           }
@@ -116,14 +114,8 @@ advanced support, process automation, and Microsoft 365 environment management.`
               type: "file",
               name: "content",
               content: {
-                es: `- Pensamiento analítico y crítico
-- Mejora continua
-- Documentación técnica clara
-- Comunicación técnica efectiva`,
-                en: `- Analytical and critical thinking
-- Continuous improvement
-- Clear technical documentation
-- Effective technical communication`
+                es: `Estado: módulo en construcción.`,
+                en: `Status: module under construction.`
               }
             }
           }
@@ -137,8 +129,8 @@ advanced support, process automation, and Microsoft 365 environment management.`
               type: "file",
               name: "content",
               content: {
-                es: `Formación orientada a tecnología, sistemas y aprendizaje autodidacta continuo.`,
-                en: `Education focused on technology, systems, and continuous self-learning.`
+                es: `Estado: módulo en construcción.`,
+                en: `Status: module under construction.`
               }
             }
           }
@@ -152,8 +144,8 @@ advanced support, process automation, and Microsoft 365 environment management.`
               type: "file",
               name: "content",
               content: {
-                es: `Proyectos de automatización, mejora de procesos y gestión de infraestructura digital.`,
-                en: `Projects related to automation, process improvement, and digital infrastructure management.`
+                es: `Estado: módulo en construcción.`,
+                en: `Status: module under construction.`
               }
             }
           }
@@ -167,8 +159,8 @@ advanced support, process automation, and Microsoft 365 environment management.`
               type: "file",
               name: "content",
               content: {
-                es: `Contacto disponible bajo solicitud profesional.`,
-                en: `Contact information available upon professional request.`
+                es: `Estado: módulo en construcción.`,
+                en: `Status: module under construction.`
               }
             }
           }
@@ -182,8 +174,12 @@ advanced support, process automation, and Microsoft 365 environment management.`
               type: "file",
               name: "content",
               content: {
+                /*
                 es: `Currículum en PDF disponible en: /assets/HermesRM_CV.pdf`,
                 en: `PDF résumé available at: /assets/HermesRM_CV.pdf`
+                */
+                es: `Estado: módulo en construcción.`,
+                en: `Status: module under construction.`
               }
             }
           }

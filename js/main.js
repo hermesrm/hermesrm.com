@@ -245,6 +245,7 @@ function printLine(text, cssClass = "") {
 async function renderHelp(helpData) {
   const addSection = async (title, items) => {
     printLine(title);
+    printLine("");
     for (const { cmd, desc } of items) {
       const line = document.createElement("div");
       line.classList.add("help-line");
