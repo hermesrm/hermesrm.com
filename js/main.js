@@ -584,6 +584,14 @@ async function handleEnter() {
    History navigation (↑ ↓)
    ============================= */
 
+// Forzar minúscula en dispositivos móviles que capitalizan automáticamente
+inputEl.addEventListener("input", (e) => {
+  const value = inputEl.value;
+  if (value.length > 0 && value[0] === value[0].toUpperCase() && value[0] !== value[0].toLowerCase()) {
+    inputEl.value = value[0].toLowerCase() + value.slice(1);
+  }
+});
+
 inputEl.addEventListener("keydown", (e) => {
   // Tab para autocompletar
   if (e.key === "Tab") {
