@@ -434,9 +434,9 @@ async function handleEnter() {
         removeLastLine();
         
         if (SessionContext.lang === "es") {
-          printLine("# Introduzca 'acerca' o 'contacto' para comenzar; 'help' muestra todos los comandos.", "comment");
+          printLine("# Introduzca 'acerca' o 'habilidades' para comenzar; 'help' muestra todos los comandos.", "comment");
         } else {
-          printLine("# Type 'about' or 'contact' to begin; 'help' shows all commands.", "comment");
+          printLine("# Type 'about' or 'skills' to begin; 'help' shows all commands.", "comment");
         }
         
         scrollToBottom();
@@ -527,10 +527,10 @@ async function handleEnter() {
     // Mostrar mensaje de bienvenida con el nombre
     if (SessionContext.lang === "es") {
       printLine(`¡Bienvenido/a, ${displayName}!`);
-      printLine("# Introduzca 'acerca' o 'contacto' para comenzar; 'help' muestra todos los comandos.", "comment");
+      printLine("# Introduzca 'acerca' o 'habilidades' para comenzar; 'help' muestra todos los comandos.", "comment");
     } else {
       printLine(`Welcome, ${displayName}!`);
-      printLine("# Type 'about' or 'contact' to begin; 'help' shows all commands.", "comment");
+      printLine("# Type 'about' or 'skills' to begin; 'help' shows all commands.", "comment");
     }
 
     scrollToBottom();
