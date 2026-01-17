@@ -721,10 +721,28 @@ if (!hiddenInputEl) {
 } else {
   let isComposing = false;
 
+  const syncInputFromHidden = () => {
+    inputEl.textContent = hiddenInputEl.value;
+  };
+
+  const setCaretToEnd = () => {
+    const end = hiddenInputEl.value.length;
+    try {
+      hiddenInputEl.setSelectionRange(end, end);
+    } catch (err) {
+      // Ignorar si el navegador no soporta setSelectionRange
+    }
+  };
+
   // Focus en input invisible al tocar la terminal
   terminal.addEventListener("click", focusHiddenInput);
 
   terminal.addEventListener("touchstart", focusHiddenInput);
+
+  hiddenInputEl.addEventListener("focus", () => {
+    syncInputFromHidden();
+    setCaretToEnd();
+  });
 
   // Manejo de composición (IME)
   hiddenInputEl.addEventListener("compositionstart", () => {
@@ -733,29 +751,31 @@ if (!hiddenInputEl) {
 
   hiddenInputEl.addEventListener("compositionend", () => {
     isComposing = false;
-    inputEl.textContent = hiddenInputEl.value;
-    const end = hiddenInputEl.value.length;
-    try {
-      hiddenInputEl.setSelectionRange(end, end);
-    } catch (err) {
-      // Ignorar si el navegador no soporta setSelectionRange
-    }
+    syncInputFromHidden();
+    setCaretToEnd();
   });
 
   // Sincronizar input invisible con span visible
   hiddenInputEl.addEventListener("input", () => {
-    inputEl.textContent = hiddenInputEl.value;
+    syncInputFromHidden();
     if (isComposing) return;
-    const end = hiddenInputEl.value.length;
-    try {
-      hiddenInputEl.setSelectionRange(end, end);
-    } catch (err) {
-      // Ignorar si el navegador no soporta setSelectionRange
-    }
+    setCaretToEnd();
+  });
+
+  hiddenInputEl.addEventListener("keyup", () => {
+    if (isComposing) return;
+    syncInputFromHidden();
+    setCaretToEnd();
   });
 
   // Manejar entrada de teclado
   hiddenInputEl.addEventListener("keydown", (e) => {
+    if (e.key === "Backspace") {
+      requestAnimationFrame(() => {
+        syncInputFromHidden();
+        setCaretToEnd();
+      });
+    }
     if (e.key === "Escape") {
       clearSuggestions();
       return;
