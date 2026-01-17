@@ -739,11 +739,6 @@ if (!hiddenInputEl) {
 
   terminal.addEventListener("touchstart", focusHiddenInput);
 
-  hiddenInputEl.addEventListener("focus", () => {
-    syncInputFromHidden();
-    setCaretToEnd();
-  });
-
   // Manejo de composición (IME)
   hiddenInputEl.addEventListener("compositionstart", () => {
     isComposing = true;
@@ -752,36 +747,20 @@ if (!hiddenInputEl) {
   hiddenInputEl.addEventListener("compositionend", () => {
     isComposing = false;
     syncInputFromHidden();
-    setCaretToEnd();
   });
 
   // Sincronizar input invisible con span visible
   hiddenInputEl.addEventListener("input", () => {
     syncInputFromHidden();
-    if (isComposing) return;
-    setCaretToEnd();
-  });
-
-  hiddenInputEl.addEventListener("keyup", () => {
-    if (isComposing) return;
-    syncInputFromHidden();
-    setCaretToEnd();
   });
 
   // Manejar entrada de teclado
   hiddenInputEl.addEventListener("keydown", (e) => {
-    if (e.key === "Backspace") {
-      requestAnimationFrame(() => {
-        syncInputFromHidden();
-        setCaretToEnd();
-      });
-    }
     if (e.key === "Escape") {
       clearSuggestions();
       return;
     }
 
-    // Tab para autocompletar
     if (e.key === "Tab") {
       e.preventDefault();
       if (!awaitingName) {
@@ -804,7 +783,6 @@ if (!hiddenInputEl) {
       return;
     }
 
-    // Enter
     if (e.key === "Enter") {
       e.preventDefault();
       clearSuggestions();
@@ -812,7 +790,6 @@ if (!hiddenInputEl) {
       return;
     }
 
-    // Historial
     const history = SessionContext.history;
 
     if (e.key === "ArrowUp") {
