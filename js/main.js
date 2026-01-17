@@ -29,7 +29,9 @@ const terminal = document.getElementById("terminal");
 const output = document.getElementById("output");
 const promptTextEl = document.getElementById("prompt-text");
 const promptSymbolEl = document.getElementById("prompt-symbol");
+const promptLineEl = document.querySelector(".prompt-line");
 const inputEl = document.getElementById("command");
+const cursorEl = document.getElementById("cursor");
 const suggestionsEl = document.getElementById("suggestions");
 
 /* =============================
@@ -228,6 +230,15 @@ function clearSuggestions() {
    Helpers UI
    ============================= */
 
+// Helpers para input sin elemento input
+function getInputValue() {
+  return inputEl.textContent || "";
+}
+
+function setInputValue(value) {
+  inputEl.textContent = value;
+}
+
 function scrollToBottom() {
   terminal.scrollTop = terminal.scrollHeight;
 }
@@ -372,6 +383,7 @@ function renderPrompt() {
   promptTextEl.innerHTML = `${prompt.userHost} <span class="prompt-path">${prompt.path}</span>`;
   promptSymbolEl.className = "prompt-symbol prompt-path";
   promptSymbolEl.textContent = "$";
+  promptLineEl.classList.remove("name-prompt");
 }
 
 /* =============================
@@ -428,6 +440,7 @@ function showWelcome() {
       nameHintNode = printLine("Introduzca su nombre si desea personalizar la sesión."); // ES: Se remueve tras capturar. EN: Removed after capture.
       promptTextEl.innerHTML = "";
       promptSymbolEl.className = "prompt";
+      promptLineEl.classList.add("name-prompt");
       promptSymbolEl.innerHTML = "Nombre <span style=\"color: #0078D4;\">(opcional)</span>: ";
     } else {
       printLine("Welcome to hermesrm.com!");
@@ -438,6 +451,7 @@ function showWelcome() {
       printLine("");
       nameHintNode = printLine("Enter your name if you want to personalize the session."); // ES: Se remueve tras capturar. EN: Removed after capture.
       promptTextEl.innerHTML = "";
+      promptLineEl.classList.add("name-prompt");
       promptSymbolEl.className = "prompt";
       promptSymbolEl.innerHTML = "Name <span style=\"color: #0078D4;\">(optional)</span>: ";
     }
@@ -453,8 +467,8 @@ let savedUsernameMode = false; // Para detectar si estamos en modo "aceptar nomb
 let changingName = false; // Para detectar si estamos cambiando de un nombre previo
 
 async function handleEnter() {
-  const rawInput = inputEl.value;
-  inputEl.value = "";
+  const rawInput = getInputValue();
+  setInputValue("");
   clearSuggestions();
 
   if (awaitingName) {
@@ -487,11 +501,13 @@ async function handleEnter() {
         
         if (SessionContext.lang === "es") {
           printLine("Ingrese un nuevo nombre:");
-          promptTextEl.innerHTML = "";
-          promptSymbolEl.className = "prompt";
+          promptLineEl.classList.add("name-prompt");
           promptSymbolEl.innerHTML = "Nombre <span style=\"color: #0078D4;\">(nuevo)</span>: ";
         } else {
           printLine("Enter a new name:");
+          promptTextEl.innerHTML = "";
+          promptSymbolEl.className = "prompt";
+          promptLineEl.classList.add("name-prompt")
           promptTextEl.innerHTML = "";
           promptSymbolEl.className = "prompt";
           promptSymbolEl.innerHTML = "Name <span style=\"color: #0078D4;\">(new)</span>: ";
@@ -641,55 +657,28 @@ async function handleEnter() {
 }
 
 /* =============================
-   History navigation (↑ ↓)
+   Keyboard event handling
    ============================= */
 
-// ES: Fuerza minúscula en móviles que capitalizan automáticamente: primer carácter y después de espacios.
-// EN: Forces lowercase on mobile auto-cap: first char and after spaces to prevent word capitalization.
-inputEl.addEventListener("input", () => {
-  if (!awaitingName) {
-    let value = inputEl.value;
-    let modified = false;
-
-    // Fuerza minúscula en el primer carácter si es mayúscula
-    if (value.length > 0 && value[0] === value[0].toUpperCase() && value[0] !== value[0].toLowerCase()) {
-      value = value[0].toLowerCase() + value.slice(1);
-      modified = true;
-    }
-
-    // Fuerza minúscula en caracteres que siguen espacios (previene autocap de móviles entre palabras)
-    const corrected = value.replace(/ ([A-Z])/g, (match, char) => " " + char.toLowerCase());
-    if (corrected !== value) {
-      value = corrected;
-      modified = true;
-    }
-
-    if (modified) {
-      const caret = inputEl.selectionStart || 0;
-      inputEl.value = value;
-      inputEl.setSelectionRange(caret, caret);
-    }
+// Manejar entrada de texto a nivel de documento
+document.addEventListener("keydown", (e) => {
+  // Ignorar si hay texto seleccionado y se usa Ctrl/Cmd (permitir copiar/pegar)
+  const selection = window.getSelection();
+  if (selection && selection.toString().length > 0 && (e.ctrlKey || e.metaKey)) {
+    return;
   }
-});
-
-inputEl.addEventListener("keydown", (e) => {
+  
   // Tab para autocompletar
   if (e.key === "Tab") {
     e.preventDefault();
-    
-    // Solo funciona si no estamos esperando el nombre
     if (!awaitingName) {
-      const input = inputEl.value;
-      
+      const input = getInputValue();
       try {
         const completions = getCompletions(input, SessionContext, commandRegistry);
-        
         if (completions.length === 1) {
-          // Si hay una única opción, aplicar
-          inputEl.value = applyCompletion(input, completions[0]);
+          setInputValue(applyCompletion(input, completions[0]));
           clearSuggestions();
         } else if (completions.length > 1) {
-          // Si hay múltiples, mostrar sugerencias bajo el prompt
           showSuggestions(completions);
         } else {
           clearSuggestions();
@@ -701,6 +690,7 @@ inputEl.addEventListener("keydown", (e) => {
     return;
   }
 
+  // Enter
   if (e.key === "Enter") {
     e.preventDefault();
     clearSuggestions();
@@ -708,60 +698,63 @@ inputEl.addEventListener("keydown", (e) => {
     return;
   }
 
+  // Historial
   const history = SessionContext.history;
-
+  
   if (e.key === "ArrowUp") {
     if (!history.length) return;
     e.preventDefault();
-
     if (SessionContext.historyIndex === null) {
       SessionContext.historyIndex = history.length - 1;
     } else if (SessionContext.historyIndex > 0) {
       SessionContext.historyIndex--;
     }
-
-    inputEl.value = history[SessionContext.historyIndex];
+    setInputValue(history[SessionContext.historyIndex]);
     clearSuggestions();
+    return;
   }
 
   if (e.key === "ArrowDown") {
     if (!history.length) return;
     e.preventDefault();
-
     if (SessionContext.historyIndex === null) return;
-
     if (SessionContext.historyIndex < history.length - 1) {
       SessionContext.historyIndex++;
-      inputEl.value = history[SessionContext.historyIndex];
+      setInputValue(history[SessionContext.historyIndex]);
     } else {
       SessionContext.historyIndex = null;
-      inputEl.value = "";
+      setInputValue("");
     }
     clearSuggestions();
+    return;
   }
-
-  // En cualquier otra tecla, ocultar sugerencias para no dejar basura visual
-  if (e.key !== "Tab") {
+  
+  // Backspace
+  if (e.key === "Backspace") {
+    const currentValue = getInputValue();
+    if (currentValue.length > 0) {
+      setInputValue(currentValue.slice(0, -1));
+    }
+    e.preventDefault();
+    return;
+  }
+  
+  // Entrada de texto normal
+  if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    let char = e.key;
+    if (!awaitingName) {
+      char = char.toLowerCase();
+    }
+    const currentValue = getInputValue();
+    setInputValue(currentValue + char);
+    e.preventDefault();
     clearSuggestions();
+    return;
   }
 });
 
 /* =============================
-   Focus & init
+   Init
    ============================= */
 
-document.addEventListener("click", (e) => {
-  // Si hay texto seleccionado, no interferar
-  const selection = window.getSelection();
-  if (selection.toString().length > 0) {
-    return;
-  }
-  
-  // Solo enfocar el input si el click NO fue en el output (para permitir seleccionar)
-  if (!output.contains(e.target)) {
-    inputEl.focus();
-  }
-});
-
 showWelcome();
-inputEl.focus();

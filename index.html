@@ -22,15 +22,9 @@
       <div class="prompt" id="prompt-text"></div>
       <div class="prompt-line">
         <span class="prompt-symbol" id="prompt-symbol">$</span>
-        <input
-          id="command"
-          type="text"
-          aria-label="Terminal input"
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="none"
-          spellcheck="false"
-        />
+        <span class="command-wrapper">
+          <span id="command" class="command-input"></span><span id="cursor" class="cursor">█</span>
+        </span>
       </div>
       <div id="suggestions" class="suggestions" style="display: none;"></div>
     </div>

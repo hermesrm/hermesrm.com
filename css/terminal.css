@@ -7,6 +7,10 @@
 /* Reset mínimo */
 * {
   box-sizing: border-box;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
 }
 
 html, body {
@@ -47,6 +51,10 @@ body {
   word-break: break-word;    /* rompe palabras largas */
   overflow-wrap: anywhere;   /* última defensa contra overflow */
   max-width: 1100px;          /* límite de ancho para mejor legibilidad */
+  user-select: text;         /* permitir selección de texto */
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
 }
 
 /* Formato de líneas de ayuda en columnas flexibles */
@@ -100,28 +108,45 @@ body {
   width: 100%;
 }
 
+/* Reducir gap cuando se pregunta por el nombre */
+.prompt-line.name-prompt {
+  gap: 2px;
+}
+
 /* Símbolo $ */
 .prompt-symbol {
   color: #ffffff;            /* blanco */
   flex-shrink: 0;
 }
-#command {
+
+/* Wrapper del comando y cursor */
+.command-wrapper {
   flex: 1;
-  min-width: 0;              /* evita overflow en pantallas pequeñas */
-  background: transparent;
-  border: none;
+  display: inline;
+  min-width: 0;
+}
+
+/* Comando como span editable visualmente */
+.command-input {
   outline: none;
   color: inherit;
   font: inherit;
-
-  /* Caret estilo terminal */
-  caret-color: #ffffff;      /* blanco */
-  caret-shape: block; /* navegadores que lo soporten */
+  white-space: pre;
 }
 
-/* Refuerzo visual del caret (fallback seguro) */
-#command:focus {
-  text-shadow: 0 0 0 #ffffff;
+/* Cursor parpadeante */
+.cursor {
+  color: #ffffff;
+  animation: blink 1s step-end infinite;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  50.1%, 100% { opacity: 0; }
 }
 
 /* Comentarios tipo shell (ej. tips)
