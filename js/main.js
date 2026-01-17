@@ -63,22 +63,26 @@ if (desktopKeyHandlingEnabled && terminal) {
 }
 
 if (terminal) {
-  terminal.addEventListener("scroll", () => {
-    if (keyboardOffset <= 0) return;
+  terminal.addEventListener(
+    "scroll",
+    () => {
+      if (keyboardOffset <= 0) return;
 
-    const promptBottom = inputLineEl
-      ? inputLineEl.offsetTop + inputLineEl.offsetHeight
-      : terminal.scrollHeight;
-    const maxScrollTop = Math.max(0, promptBottom - terminal.clientHeight);
+      const promptBottom = inputLineEl
+        ? inputLineEl.offsetTop + inputLineEl.offsetHeight
+        : terminal.scrollHeight;
+      const maxScrollTop = Math.max(0, promptBottom - terminal.clientHeight);
 
-    if (terminal.scrollTop <= maxScrollTop + 1 || clampScheduled) return;
+      if (terminal.scrollTop <= maxScrollTop + 1 || clampScheduled) return;
 
-    clampScheduled = true;
-    requestAnimationFrame(() => {
-      clampScrollToPrompt();
-      clampScheduled = false;
-    });
-  });
+      clampScheduled = true;
+      requestAnimationFrame(() => {
+        clampScrollToPrompt();
+        clampScheduled = false;
+      });
+    },
+    { passive: true }
+  );
 }
 
 if (window.visualViewport) {
@@ -393,6 +397,15 @@ function ensurePromptVisible() {
   }
 }
 
+function alignPromptToBottom() {
+  if (!terminal || !inputLineEl) return;
+  const promptBottom = inputLineEl.offsetTop + inputLineEl.offsetHeight;
+  const desiredScrollTop = Math.max(0, promptBottom - terminal.clientHeight);
+  if (Math.abs(terminal.scrollTop - desiredScrollTop) > 1) {
+    terminal.scrollTop = desiredScrollTop;
+  }
+}
+
 function updateKeyboardOffset() {
   if (!terminal || !window.visualViewport) {
     if (terminal) {
@@ -412,15 +425,19 @@ function updateKeyboardOffset() {
 
   terminal.style.height = `${viewportHeight}px`;
   terminal.style.top = `${viewportTop}px`;
-  terminal.style.setProperty("--kb-offset", `${offset}px`);
+  terminal.style.setProperty("--kb-offset", "0px");
 
   if (offset > 0) {
     requestAnimationFrame(() => {
       ensurePromptVisible();
       clampScrollToPrompt();
+      alignPromptToBottom();
     });
   } else {
-    requestAnimationFrame(clampScrollToPrompt);
+    requestAnimationFrame(() => {
+      clampScrollToPrompt();
+      alignPromptToBottom();
+    });
   }
 }
 
@@ -571,6 +588,7 @@ function renderPrompt() {
   promptSymbolEl.className = "prompt-symbol prompt-path";
   promptSymbolEl.textContent = "$\u00A0";
   requestAnimationFrame(ensurePromptVisible);
+  requestAnimationFrame(alignPromptToBottom);
 }
 
 function setPromptSymbol(label, hintText = "") {
@@ -816,6 +834,7 @@ async function handleEnter() {
   scrollToBottom();
   renderPrompt();
   requestAnimationFrame(ensurePromptVisible);
+  requestAnimationFrame(alignPromptToBottom);
 }
 
 /* =============================
