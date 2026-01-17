@@ -44,6 +44,8 @@ body {
   padding-right: env(safe-area-inset-right);
   padding-bottom: calc(env(safe-area-inset-bottom) + var(--kb-offset, 0px));
   padding-left: max(10px, env(safe-area-inset-left));
+  overscroll-behavior: contain;
+  overscroll-behavior-y: contain;
   -webkit-user-select: text;
   -moz-user-select: text;
   -ms-user-select: text;

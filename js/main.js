@@ -34,6 +34,7 @@ const suggestionsEl = document.getElementById("suggestions");
 const hiddenInputEl = document.getElementById("hidden-input");
 const inputLineEl = document.querySelector(".input-line");
 let keyboardOffset = 0;
+let clampScheduled = false;
 
 const MAX_HISTORY = 200;
 const MAX_OUTPUT_NODES = 600;
@@ -63,9 +64,20 @@ if (desktopKeyHandlingEnabled && terminal) {
 
 if (terminal) {
   terminal.addEventListener("scroll", () => {
-    if (keyboardOffset > 0) {
+    if (keyboardOffset <= 0) return;
+
+    const promptBottom = inputLineEl
+      ? inputLineEl.offsetTop + inputLineEl.offsetHeight
+      : terminal.scrollHeight;
+    const maxScrollTop = Math.max(0, promptBottom - terminal.clientHeight);
+
+    if (terminal.scrollTop <= maxScrollTop + 1 || clampScheduled) return;
+
+    clampScheduled = true;
+    requestAnimationFrame(() => {
       clampScrollToPrompt();
-    }
+      clampScheduled = false;
+    });
   });
 }
 
