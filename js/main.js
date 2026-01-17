@@ -33,6 +33,7 @@ const inputEl = document.getElementById("command");
 const suggestionsEl = document.getElementById("suggestions");
 const hiddenInputEl = document.getElementById("hidden-input");
 const inputLineEl = document.querySelector(".input-line");
+let keyboardOffset = 0;
 
 const MAX_HISTORY = 200;
 const MAX_OUTPUT_NODES = 600;
@@ -58,6 +59,14 @@ if (desktopKeyHandlingEnabled && terminal) {
   setTimeout(() => {
     terminal.focus({ preventScroll: true });
   }, 0);
+}
+
+if (terminal) {
+  terminal.addEventListener("scroll", () => {
+    if (keyboardOffset > 0) {
+      clampScrollToPrompt();
+    }
+  });
 }
 
 if (window.visualViewport) {
@@ -351,6 +360,14 @@ function scrollToBottom() {
   terminal.scrollTop = terminal.scrollHeight;
 }
 
+function clampScrollToPrompt() {
+  if (!terminal) return;
+  const maxScrollTop = Math.max(0, terminal.scrollHeight - terminal.clientHeight - keyboardOffset);
+  if (terminal.scrollTop > maxScrollTop) {
+    terminal.scrollTop = maxScrollTop;
+  }
+}
+
 function ensurePromptVisible() {
   if (!terminal || !inputLineEl) return;
   const terminalRect = terminal.getBoundingClientRect();
@@ -366,19 +383,24 @@ function ensurePromptVisible() {
 function updateKeyboardOffset() {
   if (!terminal || !window.visualViewport) {
     if (terminal) terminal.style.setProperty("--kb-offset", "0px");
+    keyboardOffset = 0;
     return;
   }
 
   const viewportHeight = window.visualViewport.height || window.innerHeight;
   const windowHeight = window.innerHeight;
   const offset = Math.max(0, windowHeight - viewportHeight);
+  keyboardOffset = offset;
 
   terminal.style.setProperty("--kb-offset", `${offset}px`);
 
   if (offset > 0) {
     requestAnimationFrame(() => {
       ensurePromptVisible();
+      clampScrollToPrompt();
     });
+  } else {
+    requestAnimationFrame(clampScrollToPrompt);
   }
 }
 
