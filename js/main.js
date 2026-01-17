@@ -32,6 +32,7 @@ const promptSymbolEl = document.getElementById("prompt-symbol");
 const inputEl = document.getElementById("command");
 const suggestionsEl = document.getElementById("suggestions");
 const hiddenInputEl = document.getElementById("hidden-input");
+const inputLineEl = document.querySelector(".input-line");
 
 const MAX_HISTORY = 200;
 const MAX_OUTPUT_NODES = 600;
@@ -350,6 +351,18 @@ function scrollToBottom() {
   terminal.scrollTop = terminal.scrollHeight;
 }
 
+function ensurePromptVisible() {
+  if (!terminal || !inputLineEl) return;
+  const terminalRect = terminal.getBoundingClientRect();
+  const inputRect = inputLineEl.getBoundingClientRect();
+  const bottomLimit = terminalRect.bottom - 4;
+
+  if (inputRect.bottom > bottomLimit) {
+    const delta = inputRect.bottom - bottomLimit;
+    terminal.scrollTop += delta;
+  }
+}
+
 function updateKeyboardOffset() {
   if (!terminal || !window.visualViewport) {
     if (terminal) terminal.style.setProperty("--kb-offset", "0px");
@@ -364,7 +377,7 @@ function updateKeyboardOffset() {
 
   if (offset > 0) {
     requestAnimationFrame(() => {
-      scrollToBottom();
+      ensurePromptVisible();
     });
   }
 }
@@ -515,6 +528,7 @@ function renderPrompt() {
   promptTextEl.appendChild(pathSpan);
   promptSymbolEl.className = "prompt-symbol prompt-path";
   promptSymbolEl.textContent = "$\u00A0";
+  requestAnimationFrame(ensurePromptVisible);
 }
 
 function setPromptSymbol(label, hintText = "") {
@@ -759,6 +773,7 @@ async function handleEnter() {
   
   scrollToBottom();
   renderPrompt();
+  requestAnimationFrame(ensurePromptVisible);
 }
 
 /* =============================
