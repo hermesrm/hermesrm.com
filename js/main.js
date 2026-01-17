@@ -361,8 +361,9 @@ function scrollToBottom() {
 }
 
 function clampScrollToPrompt() {
-  if (!terminal) return;
-  const maxScrollTop = Math.max(0, terminal.scrollHeight - terminal.clientHeight - keyboardOffset);
+  if (!terminal || !inputLineEl) return;
+  const promptBottom = inputLineEl.offsetTop + inputLineEl.offsetHeight;
+  const maxScrollTop = Math.max(0, promptBottom - terminal.clientHeight);
   if (terminal.scrollTop > maxScrollTop) {
     terminal.scrollTop = maxScrollTop;
   }
@@ -382,16 +383,23 @@ function ensurePromptVisible() {
 
 function updateKeyboardOffset() {
   if (!terminal || !window.visualViewport) {
-    if (terminal) terminal.style.setProperty("--kb-offset", "0px");
+    if (terminal) {
+      terminal.style.setProperty("--kb-offset", "0px");
+      terminal.style.removeProperty("height");
+      terminal.style.removeProperty("top");
+    }
     keyboardOffset = 0;
     return;
   }
 
   const viewportHeight = window.visualViewport.height || window.innerHeight;
+  const viewportTop = window.visualViewport.offsetTop || 0;
   const windowHeight = window.innerHeight;
-  const offset = Math.max(0, windowHeight - viewportHeight);
+  const offset = Math.max(0, windowHeight - viewportHeight - viewportTop);
   keyboardOffset = offset;
 
+  terminal.style.height = `${viewportHeight}px`;
+  terminal.style.top = `${viewportTop}px`;
   terminal.style.setProperty("--kb-offset", `${offset}px`);
 
   if (offset > 0) {
