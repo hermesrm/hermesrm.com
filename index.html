@@ -6,7 +6,8 @@
   <!-- Responsive obligatorio -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- ES: App 100% client-side; no ejecuta comandos reales. EN: App is 100% client-side; no real commands are executed. -->
+  <!-- ES: App 100% client-side; no ejecuta comandos reales. 
+       EN: App is 100% client-side; no real commands are executed. -->
 
   <title>HermesRM — CLI Profile</title>
 
@@ -16,18 +17,25 @@
 
 <body>
   <div id="terminal">
+    
+    <!-- Área de salida scrollable -->
     <div id="output"></div>
 
+    <!-- Línea de entrada fija abajo -->
     <div class="input-line">
       <div class="prompt" id="prompt-text"></div>
+
       <div class="prompt-line">
         <span class="prompt-symbol" id="prompt-symbol">$</span>
         <span class="command-wrapper">
-          <span id="command" class="command-input"></span><span id="cursor" class="cursor">█</span>
+          <span id="command" class="command-input"></span>
+          <span id="cursor" class="cursor">█</span>
         </span>
       </div>
+
       <div id="suggestions" class="suggestions" style="display: none;"></div>
     </div>
+
   </div>
 
   <!-- Punto de entrada único -->

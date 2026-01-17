@@ -1,7 +1,5 @@
 /* =============================
   Terminal CSS — hermesrm.com
-  ES: Estilos base de la terminal simulada.
-  EN: Base styles for the simulated terminal.
   ============================= */
 
 /* Reset mínimo */
@@ -17,51 +15,107 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow: hidden; /* scroll controlado por el contenedor */
+  overflow: hidden;
 }
 
-/* Base visual */
 body {
-  background-color: #0d1117; /* negro técnico */
+  background-color: #0d1117;
   color: #c9d1d9;
   font-family: "Cascadia Code", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   font-size: clamp(14px, 2.5vw, 16px);
   line-height: 1.45;
 }
 
-/* Contenedor principal de la terminal */
+/* Contenedor principal */
 #terminal {
-  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100dvh;
   padding: 16px;
   padding-left: 10px;
   overflow-y: auto;
   overflow-x: hidden;
   scroll-behavior: smooth;
-
-  /* Safe areas (iOS / móviles modernos) */
   padding-top: env(safe-area-inset-top);
   padding-right: env(safe-area-inset-right);
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: max(10px, env(safe-area-inset-left));
 }
 
-/* Salida de la terminal */
+/* Área de salida */
 #output {
-  white-space: pre-wrap;      /* mantiene saltos de línea */
-  word-break: break-word;    /* rompe palabras largas */
-  overflow-wrap: anywhere;   /* última defensa contra overflow */
-  max-width: 1100px;          /* límite de ancho para mejor legibilidad */
-  user-select: text;         /* permitir selección de texto */
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  max-width: 1100px;
+  user-select: text;
   -webkit-user-select: text;
   -moz-user-select: text;
   -ms-user-select: text;
 }
 
-/* Formato de líneas de ayuda en columnas flexibles */
+/* Línea de input */
+.input-line {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0;
+}
+
+/* Prompt */
+.prompt {
+  color: #03C04A;
+  margin-bottom: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-weight: normal;
+}
+
+.prompt-path {
+  color: #FFD700;
+}
+
+.prompt-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.prompt-symbol {
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.command-wrapper {
+  flex: 1;
+  display: inline;
+  min-width: 0;
+}
+
+.command-input {
+  outline: none;
+  color: inherit;
+  font: inherit;
+  white-space: pre;
+}
+
+.cursor {
+  color: #ffffff;
+  animation: blink 1s step-end infinite;
+  user-select: none !important;
+  pointer-events: none;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  50.1%, 100% { opacity: 0; }
+}
 
 .help-line {
   display: flex;
-  gap: 16px; /* separa más la descripción del comando */
+  gap: 16px;
   align-items: flex-start;
 }
 
@@ -78,94 +132,24 @@ body {
   padding-left: 4px;
 }
 
-/* Línea de input */
-.input-line {
-  display: flex;
-  flex-direction: column;
-  margin-top: 0;
-}
-
-/* Prompt - ahora puede ser multilínea */
-.prompt {
-  color: #03C04A;            /* verde vibrante */
-  margin-bottom: 0;
-  white-space: pre-wrap;     /* preserva saltos de línea */
-  word-break: break-word;
-  font-weight: normal;
-}
-
-/* Parte oro del prompt (ruta y símbolo) */
-.prompt-path {
-  color: #FFD700;            /* color oro/amarillo gitbash */
-}
-
-/* Contenedor del símbolo del prompt y input */
-.prompt-line {
-  display: flex;
-  align-items: center;
-  flex-wrap: nowrap;
-  width: 100%;
-}
-
-/* Símbolo $ */
-.prompt-symbol {
-  color: #ffffff;            /* blanco */
-  flex-shrink: 0;
-}
-
-/* Wrapper del comando y cursor */
-.command-wrapper {
-  flex: 1;
-  display: inline;
-  min-width: 0;
-}
-
-/* Comando como span editable visualmente */
-.command-input {
-  outline: none;
-  color: inherit;
-  font: inherit;
-  white-space: pre;
-}
-
-/* Cursor parpadeante */
-.cursor {
-  color: #ffffff;
-  animation: blink 1s step-end infinite;
-  user-select: none !important;
-  -webkit-user-select: none !important;
-  -moz-user-select: none !important;
-  -ms-user-select: none !important;
-  pointer-events: none;      /* evita interacción */
-}
-
-@keyframes blink {
-  0%, 50% { opacity: 1; }
-  50.1%, 100% { opacity: 0; }
-}
-
-/* Comentarios tipo shell (ej. tips)
-   ES: Colores alineados a convenciones de terminal con contraste legible.
-   EN: Colors aligned with terminal conventions and readable contrast. */
 .comment {
   color: #8b949e;
 }
 
-/* Errores
-   ES: Color de error visible sobre fondo oscuro.
-   EN: Error color chosen for visibility on dark background. */
 .error {
   color: #f85149;
 }
 
-/* Selección de texto */
 ::selection {
   background: #005f87;
 }
 
-/* Sugerencias bajo la línea de entrada */
 .suggestions {
   margin-top: 4px;
   color: #8b949e;
   display: none;
+}
+.suggestion-item {
+  padding: 2px 4px;
+  cursor: pointer;
 }
