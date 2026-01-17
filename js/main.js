@@ -33,6 +33,7 @@ const promptLineEl = document.querySelector(".prompt-line");
 const inputEl = document.getElementById("command");
 const cursorEl = document.getElementById("cursor");
 const suggestionsEl = document.getElementById("suggestions");
+const hiddenInputEl = document.getElementById("hidden-input");
 
 /* =============================
    Command registry
@@ -230,12 +231,13 @@ function clearSuggestions() {
    Helpers UI
    ============================= */
 
-// Helpers para input sin elemento input
+// Helpers para input
 function getInputValue() {
-  return inputEl.textContent || "";
+  return hiddenInputEl.value || "";
 }
 
 function setInputValue(value) {
+  hiddenInputEl.value = value;
   inputEl.textContent = value;
 }
 
@@ -655,23 +657,32 @@ async function handleEnter() {
    Keyboard event handling
    ============================= */
 
-// Manejar entrada de texto a nivel de documento
-document.addEventListener("keydown", (e) => {
-  // Ignorar si hay texto seleccionado y se usa Ctrl/Cmd (permitir copiar/pegar)
-  const selection = window.getSelection();
-  if (selection && selection.toString().length > 0 && (e.ctrlKey || e.metaKey)) {
-    return;
-  }
-  
+// Focus en input invisible al tocar la terminal
+terminal.addEventListener("click", () => {
+  hiddenInputEl.focus({ preventScroll: true });
+});
+
+terminal.addEventListener("touchstart", () => {
+  hiddenInputEl.focus({ preventScroll: true });
+});
+
+// Sincronizar input invisible con span visible
+hiddenInputEl.addEventListener("input", () => {
+  inputEl.textContent = hiddenInputEl.value;
+});
+
+// Manejar entrada de teclado
+hiddenInputEl.addEventListener("keydown", (e) => {
   // Tab para autocompletar
   if (e.key === "Tab") {
     e.preventDefault();
     if (!awaitingName) {
-      const input = getInputValue();
+      const input = hiddenInputEl.value;
       try {
         const completions = getCompletions(input, SessionContext, commandRegistry);
         if (completions.length === 1) {
-          setInputValue(applyCompletion(input, completions[0]));
+          hiddenInputEl.value = applyCompletion(input, completions[0]);
+          inputEl.textContent = hiddenInputEl.value;
           clearSuggestions();
         } else if (completions.length > 1) {
           showSuggestions(completions);
@@ -704,7 +715,8 @@ document.addEventListener("keydown", (e) => {
     } else if (SessionContext.historyIndex > 0) {
       SessionContext.historyIndex--;
     }
-    setInputValue(history[SessionContext.historyIndex]);
+    hiddenInputEl.value = history[SessionContext.historyIndex];
+    inputEl.textContent = hiddenInputEl.value;
     clearSuggestions();
     return;
   }
@@ -715,34 +727,13 @@ document.addEventListener("keydown", (e) => {
     if (SessionContext.historyIndex === null) return;
     if (SessionContext.historyIndex < history.length - 1) {
       SessionContext.historyIndex++;
-      setInputValue(history[SessionContext.historyIndex]);
+      hiddenInputEl.value = history[SessionContext.historyIndex];
+      inputEl.textContent = hiddenInputEl.value;
     } else {
       SessionContext.historyIndex = null;
-      setInputValue("");
+      hiddenInputEl.value = "";
+      inputEl.textContent = "";
     }
-    clearSuggestions();
-    return;
-  }
-  
-  // Backspace
-  if (e.key === "Backspace") {
-    const currentValue = getInputValue();
-    if (currentValue.length > 0) {
-      setInputValue(currentValue.slice(0, -1));
-    }
-    e.preventDefault();
-    return;
-  }
-  
-  // Entrada de texto normal
-  if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-    let char = e.key;
-    if (!awaitingName) {
-      char = char.toLowerCase();
-    }
-    const currentValue = getInputValue();
-    setInputValue(currentValue + char);
-    e.preventDefault();
     clearSuggestions();
     return;
   }
@@ -753,3 +744,8 @@ document.addEventListener("keydown", (e) => {
    ============================= */
 
 showWelcome();
+
+// Auto-focus en el input invisible
+setTimeout(() => {
+  hiddenInputEl.focus({ preventScroll: true });
+}, 100);

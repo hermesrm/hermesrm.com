@@ -108,6 +108,16 @@ body {
   pointer-events: none;
 }
 
+/* Input invisible para capturar teclado móvil */
+.hidden-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+  font-size: 16px; /* Previene zoom en iOS */
+}
+
 @keyframes blink {
   0%, 50% { opacity: 1; }
   50.1%, 100% { opacity: 0; }
