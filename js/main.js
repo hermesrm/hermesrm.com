@@ -59,6 +59,12 @@ if (desktopKeyHandlingEnabled && terminal) {
   }, 0);
 }
 
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", updateKeyboardOffset);
+  window.visualViewport.addEventListener("scroll", updateKeyboardOffset);
+}
+window.addEventListener("resize", updateKeyboardOffset);
+
 /* =============================
    Command registry
    ============================= */
@@ -342,6 +348,25 @@ function setInputValue(value) {
 
 function scrollToBottom() {
   terminal.scrollTop = terminal.scrollHeight;
+}
+
+function updateKeyboardOffset() {
+  if (!terminal || !window.visualViewport) {
+    if (terminal) terminal.style.setProperty("--kb-offset", "0px");
+    return;
+  }
+
+  const viewportHeight = window.visualViewport.height || window.innerHeight;
+  const windowHeight = window.innerHeight;
+  const offset = Math.max(0, windowHeight - viewportHeight);
+
+  terminal.style.setProperty("--kb-offset", `${offset}px`);
+
+  if (offset > 0) {
+    requestAnimationFrame(() => {
+      scrollToBottom();
+    });
+  }
 }
 
 function isNearBottom(element, threshold = 80) {
@@ -858,3 +883,4 @@ setTimeout(() => {
    ============================= */
 
 showWelcome();
+updateKeyboardOffset();
