@@ -725,15 +725,6 @@ if (!hiddenInputEl) {
     inputEl.textContent = hiddenInputEl.value;
   };
 
-  const setCaretToEnd = () => {
-    const end = hiddenInputEl.value.length;
-    try {
-      hiddenInputEl.setSelectionRange(end, end);
-    } catch (err) {
-      // Ignorar si el navegador no soporta setSelectionRange
-    }
-  };
-
   // Focus en input invisible al tocar la terminal
   terminal.addEventListener("click", focusHiddenInput);
 
@@ -751,11 +742,32 @@ if (!hiddenInputEl) {
 
   // Sincronizar input invisible con span visible
   hiddenInputEl.addEventListener("input", () => {
+    requestAnimationFrame(syncInputFromHidden);
+  });
+
+  // Asegurar sincronización en reemplazos/borrados del teclado móvil
+  hiddenInputEl.addEventListener("beforeinput", (e) => {
+    if (!e.inputType) return;
+    if (
+      e.inputType.startsWith("delete") ||
+      e.inputType === "insertReplacementText" ||
+      e.inputType === "insertText"
+    ) {
+      setTimeout(syncInputFromHidden, 0);
+    }
+  });
+
+  hiddenInputEl.addEventListener("keyup", () => {
+    if (isComposing) return;
     syncInputFromHidden();
   });
 
   // Manejar entrada de teclado
   hiddenInputEl.addEventListener("keydown", (e) => {
+    if (e.key === "Backspace" || e.key === "Delete") {
+      setTimeout(syncInputFromHidden, 0);
+    }
+
     if (e.key === "Escape") {
       clearSuggestions();
       return;
