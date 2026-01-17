@@ -103,14 +103,8 @@ body {
 .prompt-line {
   display: flex;
   align-items: center;
-  gap: 6px;
   flex-wrap: nowrap;
   width: 100%;
-}
-
-/* Reducir gap cuando se pregunta por el nombre */
-.prompt-line.name-prompt {
-  gap: 2px;
 }
 
 /* Símbolo $ */
@@ -138,10 +132,11 @@ body {
 .cursor {
   color: #ffffff;
   animation: blink 1s step-end infinite;
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  pointer-events: none;      /* evita interacción */
 }
 
 @keyframes blink {

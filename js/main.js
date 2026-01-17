@@ -382,8 +382,7 @@ function renderPrompt() {
   const prompt = buildPrompt();
   promptTextEl.innerHTML = `${prompt.userHost} <span class="prompt-path">${prompt.path}</span>`;
   promptSymbolEl.className = "prompt-symbol prompt-path";
-  promptSymbolEl.textContent = "$";
-  promptLineEl.classList.remove("name-prompt");
+  promptSymbolEl.innerHTML = "$&nbsp;";
 }
 
 /* =============================
@@ -440,8 +439,7 @@ function showWelcome() {
       nameHintNode = printLine("Introduzca su nombre si desea personalizar la sesión."); // ES: Se remueve tras capturar. EN: Removed after capture.
       promptTextEl.innerHTML = "";
       promptSymbolEl.className = "prompt";
-      promptLineEl.classList.add("name-prompt");
-      promptSymbolEl.innerHTML = "Nombre <span style=\"color: #0078D4;\">(opcional)</span>: ";
+      promptSymbolEl.innerHTML = "Nombre <span style=\"color: #0078D4;\">(opcional)</span>:&nbsp;";
     } else {
       printLine("Welcome to hermesrm.com!");
       printLine("");
@@ -451,9 +449,8 @@ function showWelcome() {
       printLine("");
       nameHintNode = printLine("Enter your name if you want to personalize the session."); // ES: Se remueve tras capturar. EN: Removed after capture.
       promptTextEl.innerHTML = "";
-      promptLineEl.classList.add("name-prompt");
       promptSymbolEl.className = "prompt";
-      promptSymbolEl.innerHTML = "Name <span style=\"color: #0078D4;\">(optional)</span>: ";
+      promptSymbolEl.innerHTML = "Name <span style=\"color: #0078D4;\">(optional)</span>:&nbsp;";
     }
   }
 }
@@ -501,16 +498,14 @@ async function handleEnter() {
         
         if (SessionContext.lang === "es") {
           printLine("Ingrese un nuevo nombre:");
-          promptLineEl.classList.add("name-prompt");
-          promptSymbolEl.innerHTML = "Nombre <span style=\"color: #0078D4;\">(nuevo)</span>: ";
+          promptTextEl.innerHTML = "";
+          promptSymbolEl.className = "prompt";
+          promptSymbolEl.innerHTML = "Nombre <span style=\"color: #0078D4;\">(nuevo)</span>:&nbsp;";
         } else {
           printLine("Enter a new name:");
           promptTextEl.innerHTML = "";
           promptSymbolEl.className = "prompt";
-          promptLineEl.classList.add("name-prompt")
-          promptTextEl.innerHTML = "";
-          promptSymbolEl.className = "prompt";
-          promptSymbolEl.innerHTML = "Name <span style=\"color: #0078D4;\">(new)</span>: ";
+          promptSymbolEl.innerHTML = "Name <span style=\"color: #0078D4;\">(new)</span>:&nbsp;";
         }
         
 
