@@ -719,14 +719,39 @@ function focusHiddenInput() {
 if (!hiddenInputEl) {
   console.error("hidden-input not found: input handling is disabled.");
 } else {
+  let isComposing = false;
+
   // Focus en input invisible al tocar la terminal
   terminal.addEventListener("click", focusHiddenInput);
 
   terminal.addEventListener("touchstart", focusHiddenInput);
 
+  // Manejo de composición (IME)
+  hiddenInputEl.addEventListener("compositionstart", () => {
+    isComposing = true;
+  });
+
+  hiddenInputEl.addEventListener("compositionend", () => {
+    isComposing = false;
+    inputEl.textContent = hiddenInputEl.value;
+    const end = hiddenInputEl.value.length;
+    try {
+      hiddenInputEl.setSelectionRange(end, end);
+    } catch (err) {
+      // Ignorar si el navegador no soporta setSelectionRange
+    }
+  });
+
   // Sincronizar input invisible con span visible
   hiddenInputEl.addEventListener("input", () => {
     inputEl.textContent = hiddenInputEl.value;
+    if (isComposing) return;
+    const end = hiddenInputEl.value.length;
+    try {
+      hiddenInputEl.setSelectionRange(end, end);
+    } catch (err) {
+      // Ignorar si el navegador no soporta setSelectionRange
+    }
   });
 
   // Manejar entrada de teclado
