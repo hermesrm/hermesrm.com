@@ -7,10 +7,6 @@
 /* Reset mínimo / Minimal reset */
 * {
   box-sizing: border-box;
-  user-select: text !important;
-  -webkit-user-select: text !important;
-  -moz-user-select: text !important;
-  -ms-user-select: text !important;
 }
 
 /* Layout raíz / Root layout */
@@ -48,6 +44,10 @@ body {
   padding-right: env(safe-area-inset-right);
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: max(10px, env(safe-area-inset-left));
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
 
 /* Área de salida / Output area */
@@ -56,10 +56,10 @@ body {
   word-break: break-word;
   overflow-wrap: anywhere;
   max-width: 1100px;
-  user-select: text;
   -webkit-user-select: text;
   -moz-user-select: text;
   -ms-user-select: text;
+  user-select: text;
 }
 
 /* Línea de input / Input line */
@@ -100,8 +100,17 @@ body {
 
 .command-wrapper {
   flex: 1;
-  display: inline;
+  display: inline-block;
   min-width: 0;
+  position: relative;
+  font-size: inherit;
+  line-height: 1.45;
+}
+
+.command-input,
+.hidden-input,
+.cursor {
+  font-size: 16px;
 }
 
 .command-input {
@@ -112,13 +121,22 @@ body {
   direction: ltr;
   unicode-bidi: plaintext;
   text-align: left;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
 
 .cursor {
   color: #ffffff;
   animation: blink 1s step-end infinite;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
   user-select: none !important;
   pointer-events: none;
+  position: relative;
+  z-index: 2;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -133,18 +151,28 @@ body {
 
 /* Input invisible para capturar teclado móvil / Hidden input for mobile keyboard */
 .hidden-input {
-  position: fixed;
-  left: -9999px;
-  top: -9999px;
-  opacity: 0;
+  position: absolute;
+  inset: 0;
+  opacity: 0.01;
   pointer-events: auto;
-  width: 1px;
-  height: 1px;
+  width: 100%;
+  height: 100%;
+  font: inherit;
+  line-height: inherit;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  color: transparent;
+  caret-color: transparent;
+  -webkit-text-fill-color: transparent;
   font-size: 16px; /* Previene zoom en iOS */
   direction: ltr;
   unicode-bidi: plaintext;
   text-align: left;
+  z-index: 1;
 }
+
 
 @keyframes blink {
   0%, 50% { opacity: 1; }

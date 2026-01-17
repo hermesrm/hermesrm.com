@@ -16,7 +16,7 @@
 </head>
 
 <body>
-  <div id="terminal" role="application" aria-label="Terminal interactiva">
+  <div id="terminal" role="application" aria-label="Terminal interactiva" tabindex="0">
     
     <!-- ES: Área de salida con scroll. EN: Scrollable output area. -->
     <div id="output" role="log" aria-live="polite" aria-atomic="false"></div>
@@ -27,10 +27,7 @@
 
       <div class="prompt-line">
         <span class="prompt-symbol" id="prompt-symbol">$</span>
-        <span class="command-wrapper">
-          <span id="command" class="command-input" dir="ltr"></span><span id="cursor" class="cursor">█</span>
-        </span>
-        <input type="text" id="hidden-input" class="hidden-input" dir="ltr" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text" aria-label="Entrada de comandos" />
+        <span class="command-wrapper"><span id="command" class="command-input" dir="ltr"></span><input type="text" id="hidden-input" class="hidden-input" dir="ltr" autocomplete="off" autocorrect="on" autocapitalize="off" spellcheck="false" inputmode="text" aria-label="Entrada de comandos" /><span id="cursor" class="cursor">█</span></span>
       </div>
 
       <div id="suggestions" class="suggestions" style="display: none;"></div>

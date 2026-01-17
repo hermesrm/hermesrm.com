@@ -35,6 +35,29 @@ const hiddenInputEl = document.getElementById("hidden-input");
 
 const MAX_HISTORY = 200;
 const MAX_OUTPUT_NODES = 600;
+const hasCoarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches;
+const hasAnyFinePointer = window.matchMedia?.("(any-pointer: fine)")?.matches;
+const hasAnyHover = window.matchMedia?.("(any-hover: hover)")?.matches;
+const isLikelyMobileUa = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+const usesVirtualKeyboard =
+  isLikelyMobileUa ||
+  (hasCoarsePointer && !hasAnyFinePointer && !hasAnyHover);
+const desktopKeyHandlingEnabled = !isLikelyMobileUa;
+const debugInput =
+  window.location.hash.includes("debug-input") ||
+  window.location.search.includes("debug-input");
+
+if (document.body) {
+  document.body.classList.toggle("desktop-input", desktopKeyHandlingEnabled);
+}
+
+if (desktopKeyHandlingEnabled && terminal) {
+  terminal.addEventListener("mousedown", () => terminal.focus({ preventScroll: true }));
+  terminal.addEventListener("click", () => terminal.focus({ preventScroll: true }));
+  setTimeout(() => {
+    terminal.focus({ preventScroll: true });
+  }, 0);
+}
 
 /* =============================
    Command registry
@@ -334,6 +357,14 @@ function printLine(text, cssClass = "") {
   output.appendChild(div);
   trimOutputNodes();
   return div;
+}
+
+function logInputEvent(label, data) {
+  if (!debugInput) return;
+  const payload = typeof data === "string" ? data : JSON.stringify(data);
+  printLine(`# ${label}: ${payload}`, "comment");
+  console.log(`[debug-input] ${label}:`, data);
+  scrollToBottom();
 }
 
 function trimOutputNodes() {
@@ -726,47 +757,32 @@ if (!hiddenInputEl) {
   };
 
   // Focus en input invisible al tocar la terminal
+  terminal.addEventListener("mousedown", focusHiddenInput);
   terminal.addEventListener("click", focusHiddenInput);
-
   terminal.addEventListener("touchstart", focusHiddenInput);
 
-  // Manejo de composición (IME)
   hiddenInputEl.addEventListener("compositionstart", () => {
     isComposing = true;
+    logInputEvent("compositionstart", hiddenInputEl.value);
   });
 
   hiddenInputEl.addEventListener("compositionend", () => {
     isComposing = false;
     syncInputFromHidden();
+    logInputEvent("compositionend", hiddenInputEl.value);
   });
 
-  // Sincronizar input invisible con span visible
+  // Sincronizar input invisible con span visible (tecleo real)
   hiddenInputEl.addEventListener("input", () => {
-    requestAnimationFrame(syncInputFromHidden);
-  });
-
-  // Asegurar sincronización en reemplazos/borrados del teclado móvil
-  hiddenInputEl.addEventListener("beforeinput", (e) => {
-    if (!e.inputType) return;
-    if (
-      e.inputType.startsWith("delete") ||
-      e.inputType === "insertReplacementText" ||
-      e.inputType === "insertText"
-    ) {
-      setTimeout(syncInputFromHidden, 0);
+    if (!isComposing) {
+      syncInputFromHidden();
     }
+    logInputEvent("input", hiddenInputEl.value);
   });
 
-  hiddenInputEl.addEventListener("keyup", () => {
-    if (isComposing) return;
-    syncInputFromHidden();
-  });
-
-  // Manejar entrada de teclado
+  // Manejar teclas especiales (Tab/Enter/Historial)
   hiddenInputEl.addEventListener("keydown", (e) => {
-    if (e.key === "Backspace" || e.key === "Delete") {
-      setTimeout(syncInputFromHidden, 0);
-    }
+    logInputEvent("keydown", { key: e.key, value: hiddenInputEl.value });
 
     if (e.key === "Escape") {
       clearSuggestions();
@@ -780,8 +796,7 @@ if (!hiddenInputEl) {
         try {
           const completions = getCompletions(input, SessionContext, commandRegistry);
           if (completions.length === 1) {
-            hiddenInputEl.value = applyCompletion(input, completions[0]);
-            inputEl.textContent = hiddenInputEl.value;
+            setInputValue(applyCompletion(input, completions[0]));
             clearSuggestions();
           } else if (completions.length > 1) {
             showSuggestions(completions);
@@ -812,8 +827,7 @@ if (!hiddenInputEl) {
       } else if (SessionContext.historyIndex > 0) {
         SessionContext.historyIndex--;
       }
-      hiddenInputEl.value = history[SessionContext.historyIndex];
-      inputEl.textContent = hiddenInputEl.value;
+      setInputValue(history[SessionContext.historyIndex]);
       clearSuggestions();
       return;
     }
@@ -824,26 +838,23 @@ if (!hiddenInputEl) {
       if (SessionContext.historyIndex === null) return;
       if (SessionContext.historyIndex < history.length - 1) {
         SessionContext.historyIndex++;
-        hiddenInputEl.value = history[SessionContext.historyIndex];
-        inputEl.textContent = hiddenInputEl.value;
+        setInputValue(history[SessionContext.historyIndex]);
       } else {
         SessionContext.historyIndex = null;
-        hiddenInputEl.value = "";
-        inputEl.textContent = "";
+        setInputValue("");
       }
       clearSuggestions();
-      return;
     }
   });
 }
+
+// Auto-focus para que el teclado funcione sin hacks de documento
+setTimeout(() => {
+  focusHiddenInput();
+}, 0);
 
 /* =============================
    Init
    ============================= */
 
 showWelcome();
-
-// Auto-focus en el input invisible
-setTimeout(() => {
-  focusHiddenInput();
-}, 100);
