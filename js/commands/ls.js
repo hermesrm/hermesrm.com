@@ -21,11 +21,19 @@ function getDisplayName(name, lang) {
   return directoryNames[name]?.[lang] || name;
 }
 
+function normalizeName(value) {
+  return (value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
 // Función inversa: convierte nombre traducido al nombre raw del filesystem
 function getInternalName(displayName, lang) {
+  const normalized = normalizeName(displayName);
   // Buscar en el mapeo inverso
   for (const [raw, translations] of Object.entries(directoryNames)) {
-    if (translations[lang] === displayName) {
+    if (normalizeName(translations[lang]) === normalized) {
       return raw;
     }
   }

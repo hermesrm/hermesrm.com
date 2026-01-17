@@ -15,11 +15,13 @@ const historyCommand = {
   },
 
   execute(context) {
-    if (!context.history.length) {
+    const lang = context?.lang === "es" ? "es" : "en";
+
+    if (!context?.history?.length) {
       return {
         es: "No hay comandos en el historial",
         en: "No commands in history"
-      }[context.lang];
+      }[lang];
     }
 
     return context.history

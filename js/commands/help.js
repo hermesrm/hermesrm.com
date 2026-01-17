@@ -51,12 +51,12 @@ const helpCommand = {
         }
       : {
           about: "About me",
-          habilidades: "Technical skills",
-          competencias: "Professional competencies",
-          experiencia: "Work experience",
-          educacion: "Education",
-          proyectos: "Personal projects",
-          contacto: "Contact information",
+          skills: "Technical skills",
+          competencies: "Professional competencies",
+          experience: "Work experience",
+          education: "Education",
+          projects: "Personal projects",
+          contact: "Contact information",
           pdf: "PDF CV location"
         };
 

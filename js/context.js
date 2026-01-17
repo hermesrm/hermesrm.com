@@ -47,6 +47,12 @@ function getCwdPath(context = SessionContext) {
 
 /* ES: Resuelve una ruta a un directorio (cd). EN: Resolve a path to a directory (cd). */
 function resolvePath(context, path) {
+  if (!context || !context.fs) {
+    return null;
+  }
+  if (typeof path !== "string") {
+    return null;
+  }
   let parts;
   let node;
   let newCwd = [];
@@ -72,12 +78,15 @@ function resolvePath(context, path) {
       newCwd.pop();
       node = context.fs;
       for (const dir of newCwd) {
+        if (!node?.children?.[dir]) {
+          return null;
+        }
         node = node.children[dir];
       }
       continue;
     }
 
-    if (!node.children || !node.children[part]) {
+    if (!node?.children || !node.children[part]) {
       return null;
     }
 
@@ -94,6 +103,9 @@ function resolvePath(context, path) {
 
 /* ES: Resuelve una ruta a un nodo (archivo o dir). EN: Resolve a path to a node (file or dir). */
 function resolveNode(context, path) {
+  if (!context || !context.fs || typeof path !== "string") {
+    return null;
+  }
   let parts;
   let node;
 
@@ -106,7 +118,7 @@ function resolveNode(context, path) {
   }
 
   for (const part of parts) {
-    if (!node.children || !node.children[part]) {
+    if (!node?.children || !node.children[part]) {
       return null;
     }
     node = node.children[part];

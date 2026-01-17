@@ -29,11 +29,12 @@ const terminal = document.getElementById("terminal");
 const output = document.getElementById("output");
 const promptTextEl = document.getElementById("prompt-text");
 const promptSymbolEl = document.getElementById("prompt-symbol");
-const promptLineEl = document.querySelector(".prompt-line");
 const inputEl = document.getElementById("command");
-const cursorEl = document.getElementById("cursor");
 const suggestionsEl = document.getElementById("suggestions");
 const hiddenInputEl = document.getElementById("hidden-input");
+
+const MAX_HISTORY = 200;
+const MAX_OUTPUT_NODES = 600;
 
 /* =============================
    Command registry
@@ -62,6 +63,56 @@ const USERNAME_MAX_LENGTH = 16;
 const PROMPT_USERNAME_REGEX = /^[a-z0-9]+$/; // Solo minúsculas y dígitos, sin espacios
 const STORAGE_KEY_PROMPT = "hermesrm_username"; // nombre seguro para el prompt (sin espacios, minúsculas)
 const STORAGE_KEY_DISPLAY = "hermesrm_username_display"; // nombre formateado para mensajes
+
+const UI_TEXT = {
+  es: {
+    welcomeBack: name => `¡Bienvenido/a de vuelta, ${name}!`,
+    continueQuestion: "¿Deseas continuar con este nombre de usuario? (s/n)",
+    answerLabel: "Respuesta",
+    welcomeLines: [
+      "¡Bienvenido/a a hermesrm.com!",
+      "",
+      "Perfil interactivo en modo CLI (Command‑Line Interface)",
+      "",
+      "Puede explorar el perfil mediante la simulación de comandos.",
+      ""
+    ],
+    nameHint: "Introduzca su nombre si desea personalizar la sesión.",
+    nameLabel: "Nombre",
+    nameOptional: "(opcional)",
+    nameNewHint: "(nuevo)",
+    newNamePrompt: "Ingrese un nuevo nombre:",
+    startHint: "# Introduzca 'acerca' o 'habilidades' para comenzar; 'help' muestra todos los comandos.",
+    invalidYesNo: "Por favor, responde con 's' (sí) o 'n' (no)",
+    welcome: name => `¡Bienvenido/a, ${name}!`
+  },
+  en: {
+    welcomeBack: name => `Welcome back, ${name}!`,
+    continueQuestion: "Do you want to continue with this username? (y/n)",
+    answerLabel: "Answer",
+    welcomeLines: [
+      "Welcome to hermesrm.com!",
+      "",
+      "Interactive CLI‑Mode Profile (Command‑Line Interface)",
+      "",
+      "Explore the profile through simulated commands.",
+      ""
+    ],
+    nameHint: "Enter your name if you want to personalize the session.",
+    nameLabel: "Name",
+    nameOptional: "(optional)",
+    nameNewHint: "(new)",
+    newNamePrompt: "Enter a new name:",
+    startHint: "# Type 'about' or 'skills' to begin; 'help' shows all commands.",
+    invalidYesNo: "Please answer with 'y' (yes) or 'n' (no)",
+    welcome: name => `Welcome, ${name}!`
+  }
+};
+
+function t(key, ...args) {
+  const entry = UI_TEXT[SessionContext.lang]?.[key];
+  return typeof entry === "function" ? entry(...args) : entry;
+}
 
 // Formatea el nombre para mostrarlo en texto: primera letra en mayúscula de hasta dos palabras
 function formatDisplayName(name) {
@@ -108,11 +159,19 @@ function clearSavedUsername() {
 function filterAliasesByLanguage(word, lang) {
   const current = aliasRegistry[lang] || {};
   const other = aliasRegistry[lang === "es" ? "en" : "es"] || {};
+  const normalizedWord = normalizeForMatch(word);
 
   // Solo sugerir alias propios del idioma actual (evita los que existen en ambos)
   return Object.keys(current)
-    .filter(alias => alias.startsWith(word))
+    .filter(alias => normalizeForMatch(alias).startsWith(normalizedWord))
     .filter(alias => !(alias in other));
+}
+
+function normalizeForMatch(value) {
+  return (value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
 }
 
 function getCompletions(input, context, commandRegistry) {
@@ -122,13 +181,14 @@ function getCompletions(input, context, commandRegistry) {
   // Si solo hay una palabra, podría ser comando o alias
   if (parts.length === 1) {
     const word = parts[0].toLowerCase();
+    const normalizedWord = normalizeForMatch(word);
     
     if (!word) return [];
     
     // Buscar comandos que coincidan con el idioma actual
     const commandMatches = commandRegistry
       .flatMap(cmd => cmd.aliases[context.lang] || [])
-      .filter(alias => alias.startsWith(word));
+      .filter(alias => normalizeForMatch(alias).startsWith(normalizedWord));
     
     // Alias solo del idioma activo (excluye los que también existen en el otro idioma)
     const aliasMatches = filterAliasesByLanguage(word, context.lang);
@@ -181,14 +241,17 @@ function getPathCompletions(pathPrefix, context) {
       return [];
     }
     
+    const normalizedPrefix = normalizeForMatch(pathPrefix);
     const items = Object.keys(currentNode.children || {});
     // Traducir nombres y filtrar por lo que el usuario escribió
     const displayItems = items.map(name => ({
       raw: name,
       display: getDisplayName(name, context.lang)
     }));
-    
-    const matches = displayItems.filter(item => item.display.startsWith(pathPrefix));
+
+    const matches = displayItems.filter(item =>
+      normalizeForMatch(item.display).startsWith(normalizedPrefix)
+    );
     
     // Devolver nombres traducidos para mostrar
     return matches.map(item => baseDir + item.display);
@@ -217,9 +280,15 @@ function showSuggestions(completions) {
   const label = SessionContext.lang === "es" ? "# Sugerencias: " : "# Suggestions: ";
   suggestionsEl.textContent = label + completions.join(", ");
   suggestionsEl.style.display = "block";
-  
-  // Hacer scroll para que las sugerencias sean visibles
-  suggestionsEl.scrollIntoView({ behavior: "smooth", block: "end" });
+
+  // Hacer scroll solo si las sugerencias quedan fuera del viewport visible
+  requestAnimationFrame(() => {
+    const terminalRect = terminal.getBoundingClientRect();
+    const suggestionsRect = suggestionsEl.getBoundingClientRect();
+    if (suggestionsRect.bottom > terminalRect.bottom) {
+      suggestionsEl.scrollIntoView({ behavior: "auto", block: "end" });
+    }
+  });
 }
 
 function clearSuggestions() {
@@ -233,10 +302,17 @@ function clearSuggestions() {
 
 // Helpers para input
 function getInputValue() {
+  if (!hiddenInputEl) {
+    return inputEl.textContent || "";
+  }
   return hiddenInputEl.value || "";
 }
 
 function setInputValue(value) {
+  if (!hiddenInputEl) {
+    inputEl.textContent = value;
+    return;
+  }
   hiddenInputEl.value = value;
   inputEl.textContent = value;
 }
@@ -245,13 +321,25 @@ function scrollToBottom() {
   terminal.scrollTop = terminal.scrollHeight;
 }
 
+function isNearBottom(element, threshold = 80) {
+  const distance = element.scrollHeight - element.scrollTop - element.clientHeight;
+  return distance <= threshold;
+}
+
 function printLine(text, cssClass = "") {
   const div = document.createElement("div");
   // ES: Espacio duro mantiene visibles las líneas en blanco. EN: Non-breaking space keeps blank lines visible.
   div.textContent = (text === "" ? "\u00A0" : text);
   if (cssClass) div.classList.add(cssClass);
   output.appendChild(div);
+  trimOutputNodes();
   return div;
+}
+
+function trimOutputNodes() {
+  while (output.childNodes.length > MAX_OUTPUT_NODES) {
+    output.removeChild(output.firstChild);
+  }
 }
 
 // Renderizado específico para la ayuda en columnas flexibles - animado
@@ -278,14 +366,11 @@ async function renderHelp(helpData) {
       line.appendChild(cmdSpan);
       line.appendChild(descSpan);
       output.appendChild(line);
+      trimOutputNodes();
       
-      // Sincronizar scroll con el renderizado del navegador
-      await new Promise(resolve => {
-        requestAnimationFrame(() => {
-          terminal.scrollTop = terminal.scrollHeight;
-          setTimeout(resolve, 80); // ~80ms entre líneas para mejor legibilidad
-        });
-      });
+      if (isNearBottom(terminal)) {
+        terminal.scrollTop = terminal.scrollHeight;
+      }
     }
     printLine("");
   };
@@ -295,7 +380,9 @@ async function renderHelp(helpData) {
   printLine(helpData.note, "comment");
   
   // Scroll final
-  terminal.scrollTop = terminal.scrollHeight;
+  if (isNearBottom(terminal)) {
+    terminal.scrollTop = terminal.scrollHeight;
+  }
   
   // Restaurar comportamiento original de scroll
   terminal.style.scrollBehavior = originalScrollBehavior;
@@ -307,32 +394,14 @@ async function printAnimated(text, delay = 5) {
   div.style.whiteSpace = "pre-wrap";
   div.style.wordBreak = "break-word";
   output.appendChild(div);
-  
-  // Desactivar scroll suave temporalmente para mejor rendimiento
-  const originalScrollBehavior = terminal.style.scrollBehavior;
-  terminal.style.scrollBehavior = "auto";
-  
-  for (let i = 0; i < text.length; i++) {
-    div.textContent += text[i];
-    
-    // Scroll cada 3 caracteres o en saltos de línea, sincronizado con el renderizado
-    if (i % 3 === 0 || text[i] === '\n') {
-      await new Promise(resolve => {
-        requestAnimationFrame(() => {
-          terminal.scrollTop = terminal.scrollHeight;
-          resolve();
-        });
-      });
-    }
-    
-    await new Promise(resolve => setTimeout(resolve, delay));
+  trimOutputNodes();
+
+  const autoScrollEnabled = isNearBottom(terminal);
+
+  div.textContent = text;
+  if (autoScrollEnabled) {
+    terminal.scrollTop = terminal.scrollHeight;
   }
-  
-  // Scroll final para asegurar que todo sea visible
-  terminal.scrollTop = terminal.scrollHeight;
-  
-  // Restaurar comportamiento original de scroll
-  terminal.style.scrollBehavior = originalScrollBehavior;
 }
 
 function removeLastLine() {
@@ -382,9 +451,31 @@ function buildPrompt() {
 
 function renderPrompt() {
   const prompt = buildPrompt();
-  promptTextEl.innerHTML = `${prompt.userHost} <span class="prompt-path">${prompt.path}</span>`;
+  promptTextEl.textContent = "";
+  promptTextEl.append(document.createTextNode(`${prompt.userHost} `));
+  const pathSpan = document.createElement("span");
+  pathSpan.className = "prompt-path";
+  pathSpan.textContent = prompt.path;
+  promptTextEl.appendChild(pathSpan);
   promptSymbolEl.className = "prompt-symbol prompt-path";
-  promptSymbolEl.innerHTML = "$&nbsp;";
+  promptSymbolEl.textContent = "$\u00A0";
+}
+
+function setPromptSymbol(label, hintText = "") {
+  promptTextEl.textContent = "";
+  promptSymbolEl.className = "prompt";
+  promptSymbolEl.textContent = "";
+  promptSymbolEl.append(document.createTextNode(label));
+
+  if (hintText) {
+    promptSymbolEl.append(document.createTextNode(" "));
+    const hintSpan = document.createElement("span");
+    hintSpan.className = "prompt-hint";
+    hintSpan.textContent = hintText;
+    promptSymbolEl.appendChild(hintSpan);
+  }
+
+  promptSymbolEl.append(document.createTextNode(":\u00A0"));
 }
 
 /* =============================
@@ -416,44 +507,16 @@ function showWelcome() {
 
     const displayName = saved.display || formatDisplayName(saved.prompt);
     
-    printLine(`¡Bienvenido/a de vuelta, ${displayName}!`);
+    printLine(t("welcomeBack", displayName));
     printLine("");
-    printLine(SessionContext.lang === "es" ? "¿Deseas continuar con este nombre de usuario? (s/n)" : "Do you want to continue with this username? (y/n)");
-    
-    if (SessionContext.lang === "es") {
-      promptTextEl.innerHTML = "";
-      promptSymbolEl.className = "prompt";
-      promptSymbolEl.textContent = "Respuesta: ";
-    } else {
-      promptTextEl.innerHTML = "";
-      promptSymbolEl.className = "prompt";
-      promptSymbolEl.textContent = "Answer: ";
-    }
+    printLine(t("continueQuestion"));
+
+    setPromptSymbol(t("answerLabel"));
   } else {
     // Primer acceso - pedir nombre
-    if (SessionContext.lang === "es") {
-      printLine("¡Bienvenido/a a hermesrm.com!");
-      printLine("");
-      printLine("Perfil interactivo en modo CLI (Command‑Line Interface)");
-      printLine("");
-      printLine("Puede explorar el perfil mediante la simulación de comandos.");
-      printLine("");
-      nameHintNode = printLine("Introduzca su nombre si desea personalizar la sesión."); // ES: Se remueve tras capturar. EN: Removed after capture.
-      promptTextEl.innerHTML = "";
-      promptSymbolEl.className = "prompt";
-      promptSymbolEl.innerHTML = "Nombre <span style=\"color: #0078D4;\">(opcional)</span>:&nbsp;";
-    } else {
-      printLine("Welcome to hermesrm.com!");
-      printLine("");
-      printLine("Interactive CLI‑Mode Profile (Command‑Line Interface)");
-      printLine("");
-      printLine("Explore the profile through simulated commands.");
-      printLine("");
-      nameHintNode = printLine("Enter your name if you want to personalize the session."); // ES: Se remueve tras capturar. EN: Removed after capture.
-      promptTextEl.innerHTML = "";
-      promptSymbolEl.className = "prompt";
-      promptSymbolEl.innerHTML = "Name <span style=\"color: #0078D4;\">(optional)</span>:&nbsp;";
-    }
+    t("welcomeLines").forEach(line => printLine(line));
+    nameHintNode = printLine(t("nameHint")); // ES: Se remueve tras capturar. EN: Removed after capture.
+    setPromptSymbol(t("nameLabel"), t("nameOptional"));
   }
 }
 
@@ -483,11 +546,7 @@ async function handleEnter() {
         // Remover la pregunta del usuario
         removeLastLine();
         
-        if (SessionContext.lang === "es") {
-          printLine("# Introduzca 'acerca' o 'habilidades' para comenzar; 'help' muestra todos los comandos.", "comment");
-        } else {
-          printLine("# Type 'about' or 'skills' to begin; 'help' shows all commands.", "comment");
-        }
+        printLine(t("startHint"), "comment");
         
         scrollToBottom();
         renderPrompt();
@@ -498,30 +557,17 @@ async function handleEnter() {
         changingName = true; // Marcar que estamos cambiando de nombre
         clearSavedUsername();
         
-        if (SessionContext.lang === "es") {
-          printLine("Ingrese un nuevo nombre:");
-          promptTextEl.innerHTML = "";
-          promptSymbolEl.className = "prompt";
-          promptSymbolEl.innerHTML = "Nombre <span style=\"color: #0078D4;\">(nuevo)</span>:&nbsp;";
-        } else {
-          printLine("Enter a new name:");
-          promptTextEl.innerHTML = "";
-          promptSymbolEl.className = "prompt";
-          promptSymbolEl.innerHTML = "Name <span style=\"color: #0078D4;\">(new)</span>:&nbsp;";
-        }
+        printLine(t("newNamePrompt"));
+        setPromptSymbol(t("nameLabel"), t("nameNewHint"));
         
 
         scrollToBottom();
-        inputEl.focus();
+        if (hiddenInputEl) hiddenInputEl.focus({ preventScroll: true });
         return;
       } else {
         // Respuesta inválida
-        if (SessionContext.lang === "es") {
-          printLine("Por favor, responde con 's' (sí) o 'n' (no)", "comment");
-        } else {
-          printLine("Please answer with 'y' (yes) or 'n' (no)", "comment");
-        }
-        inputEl.focus();
+        printLine(t("invalidYesNo"), "comment");
+        if (hiddenInputEl) hiddenInputEl.focus({ preventScroll: true });
         return;
       }
     }
@@ -575,13 +621,8 @@ async function handleEnter() {
     }
 
     // Mostrar mensaje de bienvenida con el nombre
-    if (SessionContext.lang === "es") {
-      printLine(`¡Bienvenido/a, ${displayName}!`);
-      printLine("# Introduzca 'acerca' o 'habilidades' para comenzar; 'help' muestra todos los comandos.", "comment");
-    } else {
-      printLine(`Welcome, ${displayName}!`);
-      printLine("# Type 'about' or 'skills' to begin; 'help' shows all commands.", "comment");
-    }
+    printLine(t("welcome", displayName));
+    printLine(t("startHint"), "comment");
 
     scrollToBottom();
     renderPrompt();
@@ -591,6 +632,9 @@ async function handleEnter() {
   // Normal command execution
   if (rawInput.trim()) {
     SessionContext.history.push(rawInput.trim());
+    if (SessionContext.history.length > MAX_HISTORY) {
+      SessionContext.history = SessionContext.history.slice(-MAX_HISTORY);
+    }
   }
   SessionContext.historyIndex = null;
 
@@ -623,7 +667,15 @@ async function handleEnter() {
     // Limpiar pantalla y reiniciar flujo
     output.innerHTML = "";
     showWelcome();
-    inputEl.focus();
+    if (hiddenInputEl) hiddenInputEl.focus({ preventScroll: true });
+    return;
+  }
+
+  // ES: Señal para limpiar consola. EN: Clear console signal.
+  if (result === "__CLEAR__") {
+    output.innerHTML = "";
+    renderPrompt();
+    scrollToBottom();
     return;
   }
 
@@ -657,87 +709,99 @@ async function handleEnter() {
    Keyboard event handling
    ============================= */
 
-// Focus en input invisible al tocar la terminal
-terminal.addEventListener("click", () => {
+function focusHiddenInput() {
+  if (!hiddenInputEl) return;
+  const selection = window.getSelection();
+  if (selection && selection.toString().length > 0) return;
   hiddenInputEl.focus({ preventScroll: true });
-});
+}
 
-terminal.addEventListener("touchstart", () => {
-  hiddenInputEl.focus({ preventScroll: true });
-});
+if (!hiddenInputEl) {
+  console.error("hidden-input not found: input handling is disabled.");
+} else {
+  // Focus en input invisible al tocar la terminal
+  terminal.addEventListener("click", focusHiddenInput);
 
-// Sincronizar input invisible con span visible
-hiddenInputEl.addEventListener("input", () => {
-  inputEl.textContent = hiddenInputEl.value;
-});
+  terminal.addEventListener("touchstart", focusHiddenInput);
 
-// Manejar entrada de teclado
-hiddenInputEl.addEventListener("keydown", (e) => {
-  // Tab para autocompletar
-  if (e.key === "Tab") {
-    e.preventDefault();
-    if (!awaitingName) {
-      const input = hiddenInputEl.value;
-      try {
-        const completions = getCompletions(input, SessionContext, commandRegistry);
-        if (completions.length === 1) {
-          hiddenInputEl.value = applyCompletion(input, completions[0]);
-          inputEl.textContent = hiddenInputEl.value;
-          clearSuggestions();
-        } else if (completions.length > 1) {
-          showSuggestions(completions);
-        } else {
-          clearSuggestions();
-        }
-      } catch (err) {
-        console.error("Error en autocompletación:", err);
-      }
-    }
-    return;
-  }
-
-  // Enter
-  if (e.key === "Enter") {
-    e.preventDefault();
-    clearSuggestions();
-    handleEnter();
-    return;
-  }
-
-  // Historial
-  const history = SessionContext.history;
-  
-  if (e.key === "ArrowUp") {
-    if (!history.length) return;
-    e.preventDefault();
-    if (SessionContext.historyIndex === null) {
-      SessionContext.historyIndex = history.length - 1;
-    } else if (SessionContext.historyIndex > 0) {
-      SessionContext.historyIndex--;
-    }
-    hiddenInputEl.value = history[SessionContext.historyIndex];
+  // Sincronizar input invisible con span visible
+  hiddenInputEl.addEventListener("input", () => {
     inputEl.textContent = hiddenInputEl.value;
-    clearSuggestions();
-    return;
-  }
+  });
 
-  if (e.key === "ArrowDown") {
-    if (!history.length) return;
-    e.preventDefault();
-    if (SessionContext.historyIndex === null) return;
-    if (SessionContext.historyIndex < history.length - 1) {
-      SessionContext.historyIndex++;
+  // Manejar entrada de teclado
+  hiddenInputEl.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      clearSuggestions();
+      return;
+    }
+
+    // Tab para autocompletar
+    if (e.key === "Tab") {
+      e.preventDefault();
+      if (!awaitingName) {
+        const input = hiddenInputEl.value;
+        try {
+          const completions = getCompletions(input, SessionContext, commandRegistry);
+          if (completions.length === 1) {
+            hiddenInputEl.value = applyCompletion(input, completions[0]);
+            inputEl.textContent = hiddenInputEl.value;
+            clearSuggestions();
+          } else if (completions.length > 1) {
+            showSuggestions(completions);
+          } else {
+            clearSuggestions();
+          }
+        } catch (err) {
+          console.error("Error en autocompletación:", err);
+        }
+      }
+      return;
+    }
+
+    // Enter
+    if (e.key === "Enter") {
+      e.preventDefault();
+      clearSuggestions();
+      handleEnter();
+      return;
+    }
+
+    // Historial
+    const history = SessionContext.history;
+
+    if (e.key === "ArrowUp") {
+      if (!history.length) return;
+      e.preventDefault();
+      if (SessionContext.historyIndex === null) {
+        SessionContext.historyIndex = history.length - 1;
+      } else if (SessionContext.historyIndex > 0) {
+        SessionContext.historyIndex--;
+      }
       hiddenInputEl.value = history[SessionContext.historyIndex];
       inputEl.textContent = hiddenInputEl.value;
-    } else {
-      SessionContext.historyIndex = null;
-      hiddenInputEl.value = "";
-      inputEl.textContent = "";
+      clearSuggestions();
+      return;
     }
-    clearSuggestions();
-    return;
-  }
-});
+
+    if (e.key === "ArrowDown") {
+      if (!history.length) return;
+      e.preventDefault();
+      if (SessionContext.historyIndex === null) return;
+      if (SessionContext.historyIndex < history.length - 1) {
+        SessionContext.historyIndex++;
+        hiddenInputEl.value = history[SessionContext.historyIndex];
+        inputEl.textContent = hiddenInputEl.value;
+      } else {
+        SessionContext.historyIndex = null;
+        hiddenInputEl.value = "";
+        inputEl.textContent = "";
+      }
+      clearSuggestions();
+      return;
+    }
+  });
+}
 
 /* =============================
    Init
@@ -747,5 +811,5 @@ showWelcome();
 
 // Auto-focus en el input invisible
 setTimeout(() => {
-  hiddenInputEl.focus({ preventScroll: true });
+  focusHiddenInput();
 }, 100);

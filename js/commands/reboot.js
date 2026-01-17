@@ -3,7 +3,8 @@
    Reset terminal session
    ============================= */
 
-// Devuelve una señal para que la capa principal reinicie la sesión
+// ES: Devuelve una señal para que la capa principal reinicie la sesión.
+// EN: Returns a signal so the main layer resets the session.
 const rebootCommand = {
   id: "REBOOT",
   aliases: {

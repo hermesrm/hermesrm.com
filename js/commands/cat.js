@@ -28,7 +28,7 @@ const catCommand = {
     // ES: Traduce nombre mostrado al nombre interno del filesystem. EN: Translate display name to raw FS name.
     let target = args[0];
     target = getInternalName(target, context.lang);
-    
+
     const node = resolveNode(context, target);
 
     if (!node) {
@@ -40,7 +40,7 @@ const catCommand = {
 
     // Directorio de sección del CV (content interno) - devolver como animado
     if (node.type === "dir" && node.children?.content) {
-      const text = node.children.content.content[context.lang] || "";
+      const text = node.children.content.content?.[context.lang] || "";
       return {
         type: "animated",
         text: text
@@ -49,7 +49,7 @@ const catCommand = {
 
     // Archivo multilenguaje explícito - devolver como animado
     if (node.type === "file" && node.content) {
-      const text = node.content[context.lang] || {
+      const text = node.content?.[context.lang] || {
         es: "Idioma no disponible",
         en: "Language not available"
       }[context.lang];

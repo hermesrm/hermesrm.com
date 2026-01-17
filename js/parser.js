@@ -31,13 +31,16 @@ function tokenize(input) {
   EN: Executes a registry command; returns output string (or empty).
 */
 function executeInput(rawInput, context, commandRegistry) {
-  if (!rawInput.trim()) return "";
+  if (!rawInput || !rawInput.trim()) return "";
+  if (!context || !commandRegistry || !Array.isArray(commandRegistry)) {
+    return "";
+  }
 
   const resolvedInput = resolveAlias(rawInput, context.lang);
   const { command, args } = tokenize(resolvedInput);
 
   const cmd = commandRegistry.find(c =>
-    c.aliases[context.lang]?.includes(command)
+    c?.aliases?.[context.lang]?.includes(command)
   );
 
   if (!cmd) {

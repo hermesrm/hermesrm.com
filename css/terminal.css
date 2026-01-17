@@ -1,8 +1,10 @@
 /* =============================
   Terminal CSS — hermesrm.com
+  ES: Estilos base de la terminal simulada.
+  EN: Base styles for the simulated terminal.
   ============================= */
 
-/* Reset mínimo */
+/* Reset mínimo / Minimal reset */
 * {
   box-sizing: border-box;
   user-select: text !important;
@@ -11,6 +13,7 @@
   -ms-user-select: text !important;
 }
 
+/* Layout raíz / Root layout */
 html, body {
   margin: 0;
   padding: 0;
@@ -18,6 +21,7 @@ html, body {
   overflow: hidden;
 }
 
+/* Base visual / Visual base */
 body {
   background-color: #0d1117;
   color: #c9d1d9;
@@ -26,12 +30,14 @@ body {
   line-height: 1.45;
 }
 
-/* Contenedor principal */
+/* Contenedor principal / Main container */
 #terminal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
+  height: 100vh;
+  height: 100svh;
   height: 100dvh;
   padding: 16px;
   padding-left: 10px;
@@ -44,7 +50,7 @@ body {
   padding-left: max(10px, env(safe-area-inset-left));
 }
 
-/* Área de salida */
+/* Área de salida / Output area */
 #output {
   white-space: pre-wrap;
   word-break: break-word;
@@ -56,20 +62,24 @@ body {
   -ms-user-select: text;
 }
 
-/* Línea de input */
+/* Línea de input / Input line */
 .input-line {
   display: flex;
   flex-direction: column;
   margin-top: 0;
 }
 
-/* Prompt */
+/* Prompt / Prompt */
 .prompt {
   color: #03C04A;
   margin-bottom: 0;
   white-space: pre-wrap;
   word-break: break-word;
   font-weight: normal;
+}
+
+.prompt-hint {
+  color: #0078D4;
 }
 
 .prompt-path {
@@ -108,7 +118,17 @@ body {
   pointer-events: none;
 }
 
-/* Input invisible para capturar teclado móvil */
+@media (prefers-reduced-motion: reduce) {
+  #terminal {
+    scroll-behavior: auto;
+  }
+
+  .cursor {
+    animation: none;
+  }
+}
+
+/* Input invisible para capturar teclado móvil / Hidden input for mobile keyboard */
 .hidden-input {
   position: absolute;
   opacity: 0;
@@ -123,6 +143,7 @@ body {
   50.1%, 100% { opacity: 0; }
 }
 
+/* Ayuda / Help layout */
 .help-line {
   display: flex;
   gap: 16px;
@@ -142,18 +163,22 @@ body {
   padding-left: 4px;
 }
 
+/* Comentarios / Comments */
 .comment {
   color: #8b949e;
 }
 
+/* Errores / Errors */
 .error {
   color: #f85149;
 }
 
+/* Selección de texto / Text selection */
 ::selection {
   background: #005f87;
 }
 
+/* Sugerencias / Suggestions */
 .suggestions {
   margin-top: 4px;
   color: #8b949e;

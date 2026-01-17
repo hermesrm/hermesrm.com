@@ -19,7 +19,8 @@ const echoCommand = {
       return "";
     }
 
-    return args.join(" ");
+    // ES: Normaliza salida a string. EN: Normalize output to string.
+    return args.map(arg => String(arg)).join(" ");
   }
 };
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
 
-  <!-- Responsive obligatorio -->
+  <!-- ES: Responsive obligatorio. EN: Required responsive meta. -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- ES: App 100% client-side; no ejecuta comandos reales. 
@@ -11,17 +11,17 @@
 
   <title>HermesRM — CLI Profile</title>
 
-  <!-- Estilos de la terminal -->
+  <!-- ES: Estilos de la terminal. EN: Terminal styles. -->
   <link rel="stylesheet" href="css/terminal.css" />
 </head>
 
 <body>
-  <div id="terminal">
+  <div id="terminal" role="application" aria-label="Terminal interactiva">
     
-    <!-- Área de salida scrollable -->
-    <div id="output"></div>
+    <!-- ES: Área de salida con scroll. EN: Scrollable output area. -->
+    <div id="output" role="log" aria-live="polite" aria-atomic="false"></div>
 
-    <!-- Línea de entrada fija abajo -->
+    <!-- ES: Línea de entrada fija abajo. EN: Input line fixed at bottom. -->
     <div class="input-line">
       <div class="prompt" id="prompt-text"></div>
 
@@ -31,7 +31,7 @@
           <span id="command" class="command-input"></span>
           <span id="cursor" class="cursor">█</span>
         </span>
-        <input type="text" id="hidden-input" class="hidden-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+        <input type="text" id="hidden-input" class="hidden-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Entrada de comandos" />
       </div>
 
       <div id="suggestions" class="suggestions" style="display: none;"></div>
@@ -39,7 +39,7 @@
 
   </div>
 
-  <!-- Punto de entrada único -->
+  <!-- ES: Punto de entrada único. EN: Single entry point. -->
   <script type="module" src="js/main.js"></script>
 </body>
 </html>

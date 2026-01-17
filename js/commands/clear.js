@@ -15,12 +15,8 @@ const clearCommand = {
   },
 
   execute(context) {
-    // Acceder al DOM para limpiar el output
-    const output = document.getElementById("output");
-    if (output) {
-      output.innerHTML = "";
-    }
-    return "";
+    // ES: Señal para que main.js limpie el output. EN: Signal for main.js to clear output.
+    return "__CLEAR__";
   }
 };
 
