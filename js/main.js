@@ -243,6 +243,10 @@ function printLine(text, cssClass = "") {
 
 // Renderizado específico para la ayuda en columnas flexibles - animado
 async function renderHelp(helpData) {
+  // Desactivar scroll suave temporalmente para mejor rendimiento
+  const originalScrollBehavior = terminal.style.scrollBehavior;
+  terminal.style.scrollBehavior = "auto";
+  
   const addSection = async (title, items) => {
     printLine(title);
     printLine("");
@@ -261,8 +265,14 @@ async function renderHelp(helpData) {
       line.appendChild(cmdSpan);
       line.appendChild(descSpan);
       output.appendChild(line);
-      scrollToBottom();
-      await new Promise(resolve => setTimeout(resolve, 40)); // pequeño delay entre items
+      
+      // Sincronizar scroll con el renderizado del navegador
+      await new Promise(resolve => {
+        requestAnimationFrame(() => {
+          terminal.scrollTop = terminal.scrollHeight;
+          setTimeout(resolve, 80); // ~80ms entre líneas para mejor legibilidad
+        });
+      });
     }
     printLine("");
   };
@@ -270,20 +280,46 @@ async function renderHelp(helpData) {
   await addSection(helpData.primaryTitle, helpData.primary);
   await addSection(helpData.systemTitle, helpData.system);
   printLine(helpData.note, "comment");
+  
+  // Scroll final
+  terminal.scrollTop = terminal.scrollHeight;
+  
+  // Restaurar comportamiento original de scroll
+  terminal.style.scrollBehavior = originalScrollBehavior;
 }
 
 // Imprime contenido animado carácter por carácter (máquina de escribir)
-async function printAnimated(text, delay = 3) {
+async function printAnimated(text, delay = 5) {
   const div = document.createElement("div");
   div.style.whiteSpace = "pre-wrap";
   div.style.wordBreak = "break-word";
   output.appendChild(div);
   
+  // Desactivar scroll suave temporalmente para mejor rendimiento
+  const originalScrollBehavior = terminal.style.scrollBehavior;
+  terminal.style.scrollBehavior = "auto";
+  
   for (let i = 0; i < text.length; i++) {
     div.textContent += text[i];
-    scrollToBottom();
+    
+    // Scroll cada 3 caracteres o en saltos de línea, sincronizado con el renderizado
+    if (i % 3 === 0 || text[i] === '\n') {
+      await new Promise(resolve => {
+        requestAnimationFrame(() => {
+          terminal.scrollTop = terminal.scrollHeight;
+          resolve();
+        });
+      });
+    }
+    
     await new Promise(resolve => setTimeout(resolve, delay));
   }
+  
+  // Scroll final para asegurar que todo sea visible
+  terminal.scrollTop = terminal.scrollHeight;
+  
+  // Restaurar comportamiento original de scroll
+  terminal.style.scrollBehavior = originalScrollBehavior;
 }
 
 function removeLastLine() {

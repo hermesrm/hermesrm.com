@@ -46,6 +46,7 @@ body {
   white-space: pre-wrap;      /* mantiene saltos de línea */
   word-break: break-word;    /* rompe palabras largas */
   overflow-wrap: anywhere;   /* última defensa contra overflow */
+  max-width: 1100px;          /* límite de ancho para mejor legibilidad */
 }
 
 /* Formato de líneas de ayuda en columnas flexibles */
